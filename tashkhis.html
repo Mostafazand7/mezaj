@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سامانه تشخیص و اصلاح مزاج — شش انرژی سوجوک</title>
+<style>
+@font-face{font-family:'VazirL';src:local('Vazirmatn'),local('Vazir'),local('IRANSans'),local('Tahoma');}
+:root{
+  --bg:#0e1420; --bg2:#151d2c; --card:#1b2536; --card2:#212d42; --line:#2c3a52;
+  --tx:#e8eef7; --tx2:#9fb0c8; --tx3:#6d7f99;
+  --acc:#4ecdc4; --acc2:#7c9cf5; --gold:#e5b567;
+  --wind:#5fbf6a; --heat:#e2574c; --hot:#ef8a3c; --hum:#e0bb3f; --dry:#a97c50; --cold:#4a8fdd;
+  --yang:#e2574c; --yin:#4a8fdd;
+  --ok:#4ecdc4; --warn:#e5b567;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:linear-gradient(180deg,#0b111c,#131c2b 40%,#0e1420);color:var(--tx);
+  font-family:'VazirL',Vazirmatn,Vazir,IRANSans,Tahoma,system-ui,sans-serif;line-height:1.9;font-size:15px;}
+a{color:var(--acc);}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 16px 70px;}
+
+/* ---------- header ---------- */
+header.hd{background:linear-gradient(120deg,#16202f,#1e2b40 55%,#1a2537);border:1px solid var(--line);
+  border-radius:18px;padding:22px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+header.hd:before{content:"";position:absolute;inset:0;background:
+  radial-gradient(600px 160px at 90% -20%,rgba(78,205,196,.16),transparent 70%);pointer-events:none;}
+header.hd h1{margin:0 0 6px;font-size:24px;letter-spacing:.2px;}
+header.hd p{margin:0;color:var(--tx2);font-size:13.5px;}
+.badges{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;}
+.badge{background:#0f1725;border:1px solid var(--line);color:var(--tx2);
+  border-radius:999px;padding:3px 12px;font-size:12px;}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;}
+.tab{background:var(--card);border:1px solid var(--line);color:var(--tx2);border-radius:12px;
+  padding:9px 18px;cursor:pointer;font-family:inherit;font-size:14px;transition:.15s;}
+.tab:hover{border-color:var(--acc);color:var(--tx);}
+.tab.on{background:linear-gradient(135deg,#24425f,#1f3a52);color:#fff;border-color:var(--acc);}
+.pane{display:none;} .pane.on{display:block;}
+
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:16px;align-items:start;}
+@media(max-width:980px){.grid{grid-template-columns:minmax(0,1fr);}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;}
+.card h2{margin:0 0 12px;font-size:16.5px;display:flex;align-items:center;gap:9px;}
+.card h2 .n{background:linear-gradient(135deg,var(--acc),#3a9d96);color:#08131a;width:27px;height:27px;
+  border-radius:9px;display:grid;place-items:center;font-size:13.5px;font-weight:700;flex:none;}
+.card h3{margin:16px 0 7px;font-size:14px;color:var(--acc);}
+.sub{color:var(--tx2);font-size:13px;margin:-4px 0 12px;}
+
+label.lb{display:block;font-size:13px;color:var(--tx2);margin:12px 0 6px;}
+textarea,select,input[type=text],input[type=number]{width:100%;background:#0d1420;color:var(--tx);
+  border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-family:inherit;font-size:14px;line-height:1.8;}
+textarea{min-height:190px;resize:vertical;}
+textarea:focus,select:focus,input:focus{outline:none;border-color:var(--acc);}
+select option{background:#0d1420;}
+
+.btn{background:linear-gradient(135deg,var(--acc),#37a29b);color:#06181a;border:0;border-radius:12px;
+  padding:12px 20px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;}
+.btn:hover{filter:brightness(1.1);}
+.btn.sec{background:#22304a;color:var(--tx);border:1px solid var(--line);font-weight:400;font-size:13.5px;padding:9px 16px;}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+
+/* ---------- checklist ---------- */
+.chkgrp{margin-top:8px;}
+.chkgrp .gt{font-size:12.5px;color:var(--tx3);margin:10px 0 5px;border-top:1px dashed var(--line);padding-top:8px;}
+.chk{display:inline-flex;align-items:center;gap:6px;background:#0f1826;border:1px solid var(--line);
+  border-radius:9px;padding:5px 10px;margin:0 0 5px 5px;font-size:12.5px;cursor:pointer;transition:.12s;}
+.chk:hover{border-color:var(--acc2);}
+.chk input{accent-color:var(--acc);margin:0;}
+.chk.on{background:#1c3244;border-color:var(--acc);color:#fff;}
+
+/* ---------- questionnaire ---------- */
+details.q{background:#0f1826;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;}
+details.q>summary{cursor:pointer;padding:11px 14px;font-size:14px;color:var(--tx);list-style:none;}
+details.q>summary::-webkit-details-marker{display:none;}
+details.q>summary:before{content:"▾ ";color:var(--acc);}
+.qi{border-top:1px solid var(--line);padding:9px 14px;display:flex;justify-content:space-between;
+  align-items:center;gap:10px;flex-wrap:wrap;}
+.qi .qt{font-size:13px;flex:1;min-width:200px;}
+.qi .qn{color:var(--tx3);font-size:11.5px;}
+.seg{display:flex;gap:3px;flex:none;}
+.seg button{background:#131d2c;border:1px solid var(--line);color:var(--tx2);border-radius:8px;
+  padding:4px 11px;font-size:12px;font-family:inherit;cursor:pointer;}
+.seg button.on{background:var(--acc);color:#06181a;border-color:var(--acc);font-weight:700;}
+.seg button.on.no{background:#e2574c;color:#fff;border-color:#e2574c;}
+
+/* ---------- results ---------- */
+.res{display:none;}
+.res.on{display:block;}
+.empty{text-align:center;color:var(--tx3);padding:60px 20px;border:1px dashed var(--line);border-radius:16px;}
+.empty .big{font-size:44px;margin-bottom:10px;opacity:.5;}
+
+.hero{background:linear-gradient(135deg,#1d2a3d,#233450);border:1px solid var(--line);
+  border-radius:16px;padding:20px;margin-bottom:14px;}
+.hero .ttl{font-size:13px;color:var(--tx2);}
+.hero .main{font-size:26px;font-weight:700;margin:4px 0 2px;}
+.hero .en{font-size:13px;color:var(--tx3);}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.hero,.card,.fx,.pt{min-width:0;max-width:100%;}
+.hero *,.card *{max-width:100%;}
+.pill{border-radius:999px;padding:5px 14px;font-size:12.5px;border:1px solid;}
+
+.bars{margin-top:6px;}
+.bar{display:grid;grid-template-columns:112px 1fr 52px;gap:9px;align-items:center;margin-bottom:7px;font-size:12.5px;}
+.bar .tr{background:#0d1420;border-radius:8px;height:15px;overflow:hidden;border:1px solid var(--line);}
+.bar .fl{height:100%;border-radius:8px;transition:width .5s;}
+.bar .vv{text-align:left;color:var(--tx2);font-size:12px;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top;}
+th{background:#22304a;color:var(--tx);font-size:12.5px;}
+tr:nth-child(even) td{background:#18212f;}
+
+ul.li{margin:6px 0;padding-right:20px;} ul.li li{margin-bottom:5px;}
+ol.li{margin:6px 0;padding-right:22px;} ol.li li{margin-bottom:6px;}
+
+.note{background:#1c2436;border-right:3px solid var(--gold);border-radius:10px;padding:10px 14px;
+  margin:10px 0;font-size:12.5px;color:var(--tx2);}
+.note.inf{border-right-color:var(--acc2);}
+.note.der{border-right-color:var(--warn);}
+.tag{display:inline-block;font-size:10.5px;border-radius:6px;padding:1px 7px;margin-right:6px;vertical-align:middle;}
+.tag.src{background:#1d3b34;color:#6fe0d3;border:1px solid #2f5d54;}
+.tag.der2{background:#3d3320;color:#e5b567;border:1px solid #5d4c2c;}
+
+.fx{background:#101a28;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;}
+.fx .step{display:grid;grid-template-columns:26px 1fr;gap:10px;margin-bottom:9px;align-items:start;}
+.fx .step .i{background:#22304a;border-radius:8px;width:26px;height:26px;display:grid;place-items:center;
+  font-size:12px;color:var(--acc);font-weight:700;}
+.up{color:#5fbf6a;font-weight:700;} .dn{color:#e2574c;font-weight:700;}
+
+.sw{display:inline-block;width:16px;height:16px;border-radius:5px;vertical-align:-3px;margin-left:5px;border:1px solid rgba(255,255,255,.25);}
+.ptbox{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin-top:8px;}
+.pt{background:#101a28;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;}
+.pt b{color:var(--acc);}
+
+.ref h3{color:var(--gold);}
+.disc{background:#2a1f22;border:1px solid #5a3b3f;border-radius:12px;padding:12px 15px;
+  font-size:12.5px;color:#e6b9bd;margin-top:16px;}
+.foot{text-align:center;color:var(--tx3);font-size:12px;margin-top:26px;}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#meta3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
+
+/* ---------- موبایل ---------- */
+@media(max-width:760px){
+  body{font-size:14px;}
+  .wrap{padding:12px 10px 46px;}
+  header.hd{padding:16px 15px;border-radius:14px;}
+  header.hd h1{font-size:17.5px;line-height:1.7;}
+  header.hd p{font-size:12.5px;}
+  .badge{font-size:11px;padding:2px 9px;}
+  .tabs{gap:5px;}
+  .tab{flex:1;min-width:calc(50% - 5px);padding:9px 8px;font-size:13px;text-align:center;}
+  .card{padding:14px 13px;border-radius:14px;}
+  .card h2{font-size:15px;}
+  .hero{padding:15px 14px;}
+  .hero .main{font-size:20px;line-height:1.6;}
+  .hero .en{font-size:12px;}
+  .pill{font-size:11.5px;padding:4px 11px;}
+  .bar{grid-template-columns:84px 1fr 40px;gap:6px;font-size:11.5px;}
+  .bar .tr{height:13px;}
+  th,td{padding:6px 8px;font-size:12.5px;}
+  .tw.wide table{min-width:620px;}
+  .tw.wide{border:1px solid var(--line);border-radius:10px;}
+  #meta3{grid-template-columns:1fr;}
+  textarea{min-height:150px;}
+  textarea,select,input[type=text],input[type=number]{font-size:16px;padding:10px 12px;}
+  .btnrow{flex-direction:column;}
+  .btn,.btn.sec{width:100%;padding:13px;}
+  .qi{padding:9px 11px;flex-direction:column;align-items:stretch;}
+  .qi .qt{min-width:100%;font-size:13px;}
+  .seg{width:100%;}
+  .seg button{flex:1;padding:8px 4px;font-size:13px;}
+  .ptbox{grid-template-columns:1fr;}
+  .chk{font-size:12px;padding:5px 9px;}
+  .fx{padding:12px 11px;}
+  ul.li,ol.li{padding-right:18px;}
+  #libBox>div{grid-template-columns:1fr!important;}
+  .disc{font-size:12px;}
+}
+@media(max-width:400px){
+  .tab{min-width:100%;}
+  .bar{grid-template-columns:70px 1fr 36px;}
+}
+@media print{
+  body{background:#fff;color:#000;} .tabs,.btnrow,#inputCol,.no-print{display:none!important;}
+  .grid{grid-template-columns:1fr;} .card,.hero,.fx,.pt{background:#fff;border-color:#bbb;color:#000;}
+  th{background:#eee;color:#000;} td{background:#fff!important;} .sub,.note{color:#333;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>سامانه تشخیص و اصلاح مزاج <span style="color:var(--acc)">·</span> شش انرژی سوجوک</h1>
+  <p>تحلیل شرح حال بر پایه «جزوه جامع تشخیص و اصلاح مزاج» — تلفیق طب سنتی چینی (TCM)، طب ایرانی (Unani) و نظریه ۶ انرژی سوجوک (۶ Ki) — بر اساس تعالیم استاد محمد بشارت خان</p>
+  <div class="badges">
+    <span class="badge">۶ انرژی: باد · گرما · داغی · رطوبت · خشکی · سرما</span>
+    <span class="badge">۴ مزاج: صفراوی · دموی · بلغمی · سوداوی</span>
+    <span class="badge">پرسشنامه ۳۸ سؤالی باد</span>
+    <span class="badge">خروجی ۹ محوری</span>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-p="p1">🩺 تحلیل شرح حال</button>
+  <button class="tab" data-p="p2">📚 کتابخانه شرح حال‌ها</button>
+  <button class="tab" data-p="p3">📖 مرجع جزوه</button>
+</div>
+
+<!-- ============ PANE 1 ============ -->
+<div class="pane on" id="p1">
+<div class="grid">
+
+  <div id="inputCol">
+    <div class="card">
+      <h2><span class="n">۱</span> شرح حال بیمار</h2>
+      <p class="sub">شرح حال را آزادانه به فارسی بنویسید؛ هرچه جزئیات بیشتر باشد تشخیص دقیق‌تر است.</p>
+      <label class="lb">انتخاب از کتابخانه (اختیاری)</label>
+      <select id="caseSel"><option value="">— شرح حال آماده را انتخاب کنید —</option></select>
+      <label class="lb">متن شرح حال</label>
+      <textarea id="hx" placeholder="مثال: خانم ۶۰ ساله با حملات مکرر سرگیجه چرخشی همراه با اختلال بینایی. تشدید با بلند شدن از رختخواب، حرکت سر و محیط پر سروصدا. سابقه التهاب کیسه صفرا و یبوست."></textarea>
+      <div id="meta3">
+        <div><label class="lb" style="margin-top:0">سن</label><input type="number" id="age" placeholder="مثلاً ۳۴"></div>
+        <div><label class="lb" style="margin-top:0">جنسیت</label>
+          <select id="sex"><option value="f">زن</option><option value="m">مرد</option></select></div>
+        <div><label class="lb" style="margin-top:0">سیر بیماری</label>
+          <select id="course"><option value="">نامشخص</option><option value="acute">حاد / ناگهانی</option><option value="chronic">مزمن / تدریجی</option></select></div>
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="go">تحلیل کن ▸</button>
+        <button class="btn sec" id="clr">پاک کردن</button>
+        <button class="btn sec" id="prn">چاپ / PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">۲</span> چک‌لیست نشانه‌ها</h2>
+      <p class="sub">تیک زدن نشانه‌ها دقت تشخیص را بالا می‌برد (اختیاری).</p>
+      <div id="chkBox" class="chkgrp"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">۳</span> پرسشنامه ۳۸ سؤالی باد</h2>
+      <p class="sub">ابزار اصلی جزوه برای تفکیک <b>یین باد</b> از <b>یانگ باد</b>. پاسخ ندادن = رد شدن.</p>
+      <div id="qBox"></div>
+      <div class="btnrow"><button class="btn sec" id="qclr">پاک کردن پاسخ‌ها</button></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="empty" id="emptyBox">
+      <div class="big">🧭</div>
+      شرح حال را وارد کنید و «تحلیل کن» را بزنید.<br>
+      <span style="font-size:12.5px;color:var(--tx3)">خروجی در ۹ محور درخواستی شما ارائه می‌شود.</span>
+    </div>
+    <div class="res" id="res"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ============ PANE 2 ============ -->
+<div class="pane" id="p2">
+  <div class="card"><h2><span class="n">📚</span> کتابخانه شرح حال‌های متداول</h2>
+  <p class="sub">۳ مورد مستند جزوه + ۲۰ شرح حال شایع بالینی. روی هرکدام کلیک کنید تا در تب تحلیل بارگذاری و تحلیل شود.</p>
+  <div id="libBox"></div></div>
+</div>
+
+<!-- ============ PANE 3 ============ -->
+<div class="pane" id="p3"><div id="refBox"></div></div>
+
+<div class="disc">
+<b>⚠ سلب مسئولیت:</b> این ابزار صرفاً یک دستیار آموزشی برای کار با «جزوه جامع تشخیص و اصلاح مزاج» است و جایگزین تشخیص و درمان پزشکی نیست.
+در علائم حاد و هشدار (سرگیجه ناگهانی با اختلال تکلم یا ضعف یک‌طرفه، درد قفسه سینه، افت ناگهانی بینایی، سردرد انفجاری، تب بالا، کاهش وزن بی‌دلیل) ارزیابی پزشکی فوری لازم است.
+مواردی که در جزوه صراحت ندارند با برچسب <span class="tag der2">استنتاج</span> مشخص شده‌اند و مواردی که مستقیم از متن جزوه‌اند با <span class="tag src">جزوه</span>.
+</div>
+
+<div class="foot">ساخته‌شده بر پایه «Ultimate Detailed Temperament Booklet» — نسخه کامل</div>
+</div>
+
+<script>
+/* =========================================================================
+   بخش ۱ — پایگاه دانش استخراج‌شده از جزوه
+   ========================================================================= */
+const E = {
+  wind:{
+    key:'wind', fa:'باد', en:'Wind', el:'چوب', elEn:'Wood', color:'var(--wind)',
+    hex:'#5fbf6a', colorFa:'سبز', colorEn:'Green',
+    yinOrgan:'کبد', yinOrganEn:'Liver', yangOrgan:'کیسه صفرا', yangOrganEn:'Gallbladder',
+    emotion:'خشم و خلاقیت', emotionEn:'Anger & Creativity',
+    age:'۰ تا ۱۲ سال',
+    body:'قد بلند، استخوان‌بندی محکم، ورزیده، انعطاف‌پذیر، صدای بلند',
+    bodyTbl:'بسیار لاغر، استخوان‌بندی محکم، ورزیده',
+    move:'سریع، بی‌قرار، تکانشی',
+    skin:'حالت چهره متعجب',
+    voice:'بلند، داد و فریاد، گفتار سریع',
+    person:'سلطه‌جو، کارگردان، عجول، رقابتی، تکانشی',
+    sleep:'شب‌بیدار (دیرخوابی)، اشتها به ترشی',
+    behavior:'تکانشی، بلندپرواز، ماجراجو، حساس به بی‌عدالتی، مستعد خشم ناگهانی',
+    imbalance:'درد، مشکلات گوارشی، سرگیجه، اسپاسم عضلانی، تیک عصبی، شروع ناگهانی علائم',
+    season:'بهار'
+  },
+  heat:{
+    key:'heat', fa:'گرما', en:'Heat', el:'آتش', elEn:'Fire', color:'var(--heat)',
+    hex:'#e2574c', colorFa:'قرمز', colorEn:'Red',
+    yinOrgan:'قلب', yinOrganEn:'Heart', yangOrgan:'روده کوچک', yangOrganEn:'Small Intestine',
+    emotion:'شادی و اجتماع‌گرایی', emotionEn:'Joy & Sociability',
+    age:'۱۳ تا ۲۴ سال',
+    body:'تناسب اندام، پوست گرم و مایل به قرمز، نبض سریع، حرارت زیاد بدن',
+    bodyTbl:'تناسب اندام طبیعی',
+    move:'چابک با هدف، پرانرژی',
+    skin:'شاد، گرم، مایل به قرمز',
+    voice:'بسیار بلند، پرنشاط، پرحرف',
+    person:'تاثیرگذار، تعامل‌گرا، فعال، جسور، نمایشی',
+    sleep:'سحرخیز، رویاپرداز (۵-۷ ساعت)، علاقه به تندی',
+    behavior:'اجتماعی، پرحرف، فعال، نمایشی، خوش‌برخورد',
+    imbalance:'بی‌خوابی، اضطراب، تپش قلب، تعریق مفرط',
+    season:'تابستان'
+  },
+  hotness:{
+    key:'hotness', fa:'داغی', en:'Hotness', el:'آتش ثانویه', elEn:'Secondary Fire', color:'var(--hot)',
+    hex:'#ef8a3c', colorFa:'نارنجی', colorEn:'Orange',
+    yinOrgan:'مغز', yinOrganEn:'Brain', yangOrgan:'نخاع', yangOrganEn:'Spinal Cord',
+    emotion:'کاریزما و رهبری', emotionEn:'Charisma & Leadership',
+    age:'۲۴ تا ۳۶ سال',
+    body:'چابک، چهره شاد و درخشان، صدای دلنشین',
+    bodyTbl:'هیکل سنگین ولی چابک',
+    move:'دقیق، سریع، گسترده، روان',
+    skin:'براق و روشن، قوام خوب',
+    voice:'دل‌نشین، خوش‌آهنگ، رضایت‌بخش',
+    person:'رهبر، جاه‌طلب، خودکنترل، سخاوتمند، کاریزماتیک',
+    sleep:'خواب سبک و کم‌عمق (۴-۵ ساعت)',
+    behavior:'رهبر، کاریزماتیک، آینده‌نگر، دارای اعتمادبه‌نفس بالا، جاه‌طلب',
+    imbalance:'بی‌خوابی شدید، افت شدید انرژی، خستگی مزمن به دلیل کار کشیدن مفرط',
+    season:'اواخر تابستان'
+  },
+  humidity:{
+    key:'humidity', fa:'رطوبت', en:'Humidity', el:'خاک', elEn:'Earth', color:'var(--hum)',
+    hex:'#e0bb3f', colorFa:'زرد', colorEn:'Yellow',
+    yinOrgan:'طحال', yinOrganEn:'Spleen', yangOrgan:'معده', yangOrganEn:'Stomach',
+    emotion:'نگرانی و ثبات', emotionEn:'Worry & Stability',
+    age:'۳۶ تا ۴۸ سال',
+    body:'بدن سنگین، مستعد چاقی، پوست مایل به زرد، نرم به لمس',
+    bodyTbl:'چاق، نرم به لمس، سنگین',
+    move:'آرام، روان، کند، گام‌های سنگین',
+    skin:'چرب، مایل به زرد، نگران، متفکر',
+    voice:'خوش‌آهنگ، آرام و مطمئن',
+    person:'حمایتگر، تثبیت‌کننده، سنتی، مضطرب',
+    sleep:'سحرخیز، خواب سنگین (۷-۸ ساعت)',
+    behavior:'قابل اعتماد، حامی، مهربان، صبور، سنتی',
+    imbalance:'نفخ، سنگینی خواب، وسواس فکری، ابهام ذهنی (مه مغزی)',
+    season:'اواخر تابستان / رطوبت'
+  },
+  dryness:{
+    key:'dryness', fa:'خشکی', en:'Dryness', el:'فلز', elEn:'Metal', color:'var(--dry)',
+    hex:'#a97c50', colorFa:'قهوه‌ای', colorEn:'Brown',
+    yinOrgan:'ریه', yinOrganEn:'Lung', yangOrgan:'روده بزرگ', yangOrganEn:'Large Intestine',
+    emotion:'غم و منطق', emotionEn:'Grief & Logic',
+    age:'۴۸ تا ۶۰ سال',
+    body:'لاغر و استخوانی، پوست خشک، حرکات دقیق و سنجیده',
+    bodyTbl:'لاغر و استخوانی اما پایدار',
+    move:'کند، ضعیف، محدود، سنجیده',
+    skin:'خشک، رنگ‌پریده، کم‌خنده، جدی',
+    voice:'بم، ناگهانی، خشن، آه کشیدن',
+    person:'مطیع، محتاط، منظم، سرسخت، منطقی',
+    sleep:'سحرخیز، بی‌خوابی نیمه‌شب (۷-۸ ساعت)',
+    behavior:'منظم، منطقی، وقت‌شناس، محتاط، گذشته‌نگر',
+    imbalance:'یبوست، مشکلات تنفسی، خشکی پوست',
+    season:'پاییز'
+  },
+  coldness:{
+    key:'coldness', fa:'سرما', en:'Coldness', el:'آب', elEn:'Water', color:'var(--cold)',
+    hex:'#4a8fdd', colorFa:'آبی', colorEn:'Blue',
+    yinOrgan:'کلیه', yinOrganEn:'Kidney', yangOrgan:'مثانه', yangOrganEn:'Bladder',
+    emotion:'ترس و عمق‌نگری', emotionEn:'Fear & Depth',
+    age:'۶۰ تا ۷۲ سال',
+    body:'بدن ضعیف و شکننده، پوست سرد و تیره، بسیار حساس به سرما',
+    bodyTbl:'ضعیف و شکننده، حساس به سرما',
+    move:'کند، محتاطانه، با قدم‌های کشیده',
+    skin:'شل و شکننده، سرد، تاریک، ترسیده',
+    voice:'ضعیف، خش‌دار، ناله کردن، آهسته',
+    person:'دوری‌گزین، ترسو، احساساتی، منزوی، رازدار',
+    sleep:'خواب‌آلودگی در روز، عمیق (۱۰ ساعت)',
+    behavior:'درون‌گرا، عمیق، محتاط، رازدار، گوشه‌گیر',
+    imbalance:'ریزش مو، ضعف کلیه، کمردرد، افسردگی',
+    season:'زمستان'
+  }
+};
+const EK = ['wind','heat','hotness','humidity','dryness','coldness'];
+
+/* قانون محور (Axis Law) — انرژی‌های مقابل روی چرخه ۶ انرژی */
+const AXIS = {wind:'dryness', dryness:'wind', heat:'coldness', coldness:'heat', hotness:'humidity', humidity:'hotness'};
+/* چرخه تولید (مادر ← فرزند) */
+const CHILD  = {wind:'heat', heat:'hotness', hotness:'humidity', humidity:'dryness', dryness:'coldness', coldness:'wind'};
+const MOTHER = {heat:'wind', hotness:'heat', humidity:'hotness', dryness:'humidity', coldness:'dryness', wind:'coldness'};
+/* قانون کنترل (چرخه مخرب) طبق مثال جزوه: با افزایش رطوبت، باد کاهش می‌یابد */
+const CONTROLLED = {wind:'humidity', humidity:'coldness', coldness:'heat', heat:'dryness', hotness:'dryness', dryness:'wind'};
+
+/* ۴ مزاج طب ایرانی (Unani) — عیناً از جزوه */
+const TEMP = {
+  choleric:{fa:'گرم و خشک (صفراوی)', en:'Choleric',
+    phys:'پوست گرم و زردرنگ، لاغراندام، تشنگی زیاد، دهان خشک',
+    behav:'پرانرژی، سریع‌الانتقال، زودعصبانی',
+    diet:'مصرف غذاهای سرد و تر (مانند کاهو، ماست، خیار). پرهیز از گرمی‌جات.'},
+  sanguine:{fa:'گرم و تر (دموی)', en:'Sanguine',
+    phys:'بدن تنومند، پوست گلگون، تعریق زیاد، اشتهای قوی',
+    behav:'اجتماعی، پرشور، شجاع، شوخ‌طبع، صبور، دارای روابط عمومی بالا',
+    diet:'کاهش مصرف غذاهای گرم (گوشت قرمز)، مصرف غذاهای سرد و خنک (مانند غوره، سماق، لیمو، انار).'},
+  phlegmatic:{fa:'سرد و تر (بلغمی)', en:'Phlegmatic',
+    phys:'چاق (اضافه وزن)، پوست سفید رنگ‌پریده و سرد، کم‌انرژی، خواب زیاد، موی نازک',
+    behav:'آرام، صبور، کند در اعمال، خونسرد و بااحتیاط',
+    diet:'مصرف غذاهای گرم و خشک (مانند عسل، زنجبیل). پرهیز از لبنیات و غذاهای سرد.'},
+  melancholic:{fa:'سرد و خشک (سوداوی)', en:'Melancholic',
+    phys:'لاغراندام، مفاصل خشک، پوست تیره، مستعد یبوست',
+    behav:'حساس، وسواسی، درون‌گرا، متفکر، گوشه‌گیر',
+    diet:'مصرف غذاهای گرم و تر (مانند انجیر، بادام). پرهیز از غذاهای خشک (مانند عدس، بادمجان).'}
+};
+
+/* سطح ذهن — استنتاج از پروفایل رفتاری جزوه */
+const MIND = {
+  wind:{state:'ذهنِ جهنده و بی‌قرار؛ ایده‌های سریع و نیمه‌تمام، تصمیم‌گیری دشوار («نمی‌داند چه می‌خواهد» — س.۶ پرسشنامه)، تخیل قوی که می‌تواند به خودبزرگ‌بینی کاذب بلغزد (س.۳).',
+    fix:['تک‌وظیفگی: در هر بازه فقط یک کار — قطع تعدد پروژه','برنامه مکتوب صبحگاهی با حداکثر ۳ اولویت؛ ذهن باد بدون قاب بیرونی مهار نمی‌شود','تنفس شمارشی ۴-۷-۸ سه بار در روز (کاهش تکانش)','قطع محرک‌های شتاب‌دهنده: قهوه زیاد، اسکرول سریع، رانندگی پرسرعت (س.۳۷)','تعیین «زمان تصمیم» ثابت به‌جای تصمیم لحظه‌ای']},
+  heat:{state:'ذهنِ پراکنده در روابط و محرک‌ها؛ پرگویی، هیجان‌زدگی، ناتوانی در سکوت، افکار شبانه که خواب را می‌شکنند.',
+    fix:['۳۰ دقیقه سکوت و خلوت روزانه بدون گفت‌وگو و صفحه‌نمایش','قطع محرک بصری و اجتماعی ۲ ساعت پیش از خواب','نوشتن به‌جای گفتن: تخلیه ذهن روی کاغذ پیش از خواب','کاهش تعهدات اجتماعی هم‌زمان']},
+  hotness:{state:'ذهنِ جاه‌طلب و بیش‌فعال؛ برنامه‌ریزی بی‌وقفه آینده، ناتوانی در «خاموش کردن» ذهن، فرسودگی از کار کشیدن مفرط (علامت عدم تعادل داغی در جزوه).',
+    fix:['تعیین سقف ساعت کاری و پایبندی به آن — مهم‌ترین اصلاح','یک روز کامل بدون هدف‌گذاری در هفته','خواب پیش از نیمه‌شب؛ داغی با کم‌خوابی تشدید می‌شود','واگذاری مسئولیت به دیگران (کاهش کنترل‌گری)']},
+  humidity:{state:'ذهنِ نشخوارگر؛ نگرانی چرخشی، وسواس فکری و «مه مغزی» (ابهام ذهنی) که در جزوه از علائم عدم تعادل رطوبت است.',
+    fix:['قاعده «زمانِ نگرانی»: ۱۵ دقیقه در روز، خارج از آن ممنوع','حرکت بدنی روزانه — رطوبت با سکون تجمع می‌کند','تصمیم‌گیری سریع در امور کم‌اهمیت برای شکستن چرخه تردید','کاهش شیرینی و لبنیات که مه مغزی را تشدید می‌کنند']},
+  dryness:{state:'ذهنِ منتقد و کمال‌گرا؛ منطق‌محور، گذشته‌نگر، درگیر افسوس و «باید»ها، دشواری در رها کردن.',
+    fix:['تمرین رها کردن: هر روز یک کار ناتمام را عمداً ناتمام بگذارید','نوشتن روزانه سه چیز که «به‌اندازه کافی خوب» بوده‌اند','کار با نفس عمیق شکمی (ریه = اندام خشکی)','ارتباط انسانی گرم و بدون هدف کاری']},
+  coldness:{state:'ذهنِ محتاط و آینده‌هراس؛ سناریوسازی منفی، انزوا، رازداری افراطی، افت انگیزه (افسردگی از علائم عدم تعادل سرما در جزوه).',
+    fix:['گرم کردن فیزیکی: کمر و کف پا (مسیر کلیه/مثانه) — بدن سرد ذهن ترسو می‌سازد','قرار اجتماعی برنامه‌ریزی‌شده هفتگی (شکستن انزوا)','نوشتن ترس و بررسی احتمال واقعی وقوع آن','نور و آفتاب روزانه؛ کاهش خواب مفرط روزانه']}
+};
+
+/* سطح احساسات — احساس غالب و اصلاح */
+const EMO = {
+  wind:{main:'خشم، بی‌قراری، زودرنجی، حس بی‌عدالتی',
+    excess:'انفجار خشم ناگهانی، پرتاب اشیاء و فریاد (س.۲۱ = یانگ باد) یا کینه و انتقام و اخم طولانی (س.۲۲ و ۲۳ = یین باد)',
+    fix:['تخلیه سالم خشم: ورزش هوازی شدید ۲۰ دقیقه، نه سرکوب','در یین‌باد: کار روی بخشش و رها کردن کینه — کینه باد را در کبد حبس می‌کند','در یانگ‌باد: تأخیر ۹۰ ثانیه‌ای پیش از واکنش','کاهش محرک‌های ناگهانی محیطی (صدای بلند، بو — س.۳۴)']},
+  heat:{main:'شادی افراطی، هیجان، اجتماع‌گرایی مفرط',
+    excess:'اضطراب، تپش قلب، بی‌خوابی از هیجان',
+    fix:['کاهش شدت هیجان مثبت و منفی؛ ثبات به‌جای اوج','خلوت و سکوت روزانه','پرهیز از گفت‌وگوهای هیجانی شب']},
+  hotness:{main:'کاریزما، رهبری، نیاز به دیده‌شدن',
+    excess:'جاه‌طلبی فرساینده، ناتوانی در استراحت، افت شدید انرژی',
+    fix:['پذیرش دیده‌نشدن؛ تمرین نقش غیررهبری','استراحت برنامه‌ریزی‌شده به‌عنوان وظیفه','کاهش رقابت‌جویی']},
+  humidity:{main:'نگرانی، دلبستگی، نیاز به ثبات',
+    excess:'نگرانی مزمن، وسواس فکری، وابستگی',
+    fix:['محدود کردن زمان نگرانی','قطع نشخوار با فعالیت بدنی','مرزگذاری در نقش حمایتگری — رطوبت زیاد از مراقبت بیش‌ازحد از دیگران می‌آید']},
+  dryness:{main:'غم، اندوه، سوگ، منطق‌گرایی',
+    excess:'اندوه مزمن، دلتنگی گذشته، جدایی عاطفی',
+    fix:['اجازه گریه و ابراز سوگ؛ خشکی از سوگ بیان‌نشده تغذیه می‌شود','تنفس عمیق و آه آگاهانه','ارتباط عاطفی نزدیک و منظم']},
+  coldness:{main:'ترس، احتیاط، عمق‌نگری',
+    excess:'اضطراب آینده، ترس فلج‌کننده، انزوا، افسردگی',
+    fix:['مواجهه تدریجی با موقعیت ترسناک','گرمای فیزیکی و تماس انسانی','تقویت حس امنیت: نظم مالی و برنامه ثابت روزانه']}
+};
+
+/* نقاط سوجوک و طب سوزنی — پایه جزوه: ماساژ نقاط دردناک ارگان مربوطه روی دست و پا ۳ تا ۵ بار روزانه */
+const PTS = {
+  wind:{
+    sujok:'ناحیه تناظری <b>کبد</b>: در سیستم تناظر استاندارد دست، ربع فوقانی سمت راست کف دست (زیر برجستگی انگشتان، طرف شست) — و <b>کیسه صفرا</b> درست کنار آن. نقطه دردناک را پیدا و ۳ تا ۵ بار در روز ماساژ دهید.',
+    tcm:[['LR-3','تای‌چونگ — گودی بین انگشت شست و دوم پا؛ اصلی‌ترین نقطه فرونشاندن باد کبد'],['GB-20','فنگ‌چی («برکه باد») — پشت گردن زیر جمجمه؛ سرگیجه و سردرد بادی'],['GB-34','یانگ‌لینگ‌چوان — زیر زانو سمت خارج؛ اسپاسم و گرفتگی عضلانی'],['LR-2','شینگ‌جیان — برای باد همراه با حرارت و خشم انفجاری']]},
+  heat:{
+    sujok:'ناحیه تناظری <b>قلب</b>: مرکز کف دست، کمی بالاتر از خط میانی؛ و <b>روده کوچک</b> در ناحیه شکمی تناظر (پایین کف دست).',
+    tcm:[['HT-7','شن‌من — چین مچ دست سمت انگشت کوچک؛ تپش قلب، بی‌خوابی، اضطراب'],['PC-6','نی‌گوان — ۳ انگشت بالای مچ داخلی؛ تپش، تهوع، آرام‌سازی'],['SI-3','هوشی — لبه خارجی کف دست'],['HT-8','شائوفو — کف دست؛ گرمای قلب']]},
+  hotness:{
+    sujok:'ناحیه تناظری <b>مغز و نخاع</b>: نوک و پالپ انگشت شست (تناظر سر) و خط پشت انگشت شست / لبه دست (تناظر ستون فقرات).',
+    tcm:[['GV-20','بای‌هوی — مرکز فرق سر؛ تنظیم داغی و بیش‌فعالی ذهن'],['GV-14','دا-ژویی — زیر مهره هفتم گردنی؛ تخلیه حرارت'],['یین‌تانگ','بین دو ابرو؛ آرام‌سازی ذهن و بی‌خوابی'],['GV-4','مینگ‌من — تنظیم محور نخاعی']]},
+  humidity:{
+    sujok:'ناحیه تناظری <b>طحال و معده</b>: مرکز کف دست، ناحیه شکمی (بین برجستگی تنار و مرکز).',
+    tcm:[['SP-6','سان‌یین‌جیائو — ۴ انگشت بالای قوزک داخلی؛ تخلیه رطوبت'],['SP-9','یین‌لینگ‌چوان — زیر زانو داخل؛ قوی‌ترین نقطه خشکاندن رطوبت'],['ST-36','زوسان‌لی — زیر کشکک خارج؛ تقویت هضم'],['ST-40','فنگ‌لونگ — ساق پا؛ حل بلغم و مه مغزی']]},
+  dryness:{
+    sujok:'ناحیه تناظری <b>ریه</b>: ناحیه قفسه سینه در کف دست (بالای مرکز، دو طرف)؛ و <b>روده بزرگ</b> در محیط ناحیه شکمی.',
+    tcm:[['LU-9','تای‌یوان — چین مچ سمت شست؛ تقویت ریه'],['LU-7','لیه‌چوئه — بالای مچ سمت شست؛ سرفه و تنفس'],['LI-4','هه‌گو — بین شست و سبابه؛ روده بزرگ و یبوست'],['LI-11','چو-چی — چین آرنج خارجی']]},
+  coldness:{
+    sujok:'ناحیه تناظری <b>کلیه</b>: ناحیه پایین کف دست دو طرف خط میانی (تناظر ناحیه کمری)؛ و <b>مثانه</b> پایین‌تر از آن.',
+    tcm:[['KI-3','تای‌شی — بین قوزک داخلی و تاندون آشیل؛ تقویت اصلی کلیه'],['KI-1','یونگ‌چوان — کف پا؛ گرم کردن و پایین کشیدن انرژی'],['BL-23','شن‌شو — کمر، دو طرف مهره دوم کمری؛ کمردرد و ضعف کلیه'],['GV-4','مینگ‌من — «دروازه حیات»؛ گرم کردن یانگ کلیه']]}
+};
+
+/* =========================================================================
+   بخش ۲ — واژگان تشخیصی فارسی (Lexicon)
+   هر مدخل: [کلیدواژه, انرژی, وزن, یانگ+, یین+]
+   ========================================================================= */
+const LEX = [
+/* ---------------- باد ---------------- */
+['سرگیجه','wind',3,1,0],['سرگیجه چرخشی','wind',4,2,0],['ورتیگو','wind',3,1,0],['گیج','wind',1.5,0,0],
+['تیک','wind',4,0,1],['پرش پلک','wind',4,0,1.5],['پرش عضله','wind',3,0,1],['ماهیچه‌ای','wind',1,0,.5],
+['لرزش','wind',3,.5,.5],['رعشه','wind',3,.5,.5],['تشنج','wind',3.5,2,0],['صرع','wind',4,2,0],
+['اسپاسم','wind',3,.5,.5],['گرفتگی عضل','wind',3,0,1],['کرامپ','wind',2.5,0,1],
+['خشم','wind',3,1.5,0],['عصبانی','wind',2.5,1,0],['زودرنج','wind',2.5,0,.5],['پرخاشگر','wind',3,2,0],
+['فریاد','wind',2,2,0],['پرت می','wind',2,2,0],['داد می','wind',2,2,0],
+['کینه','wind',2.5,0,2],['انتقام','wind',2.5,0,2],['اخم','wind',1.5,0,1.5],
+['بی‌قرار','wind',2.5,.5,0],['بیقرار','wind',2.5,.5,0],['تکانش','wind',2.5,1,0],['عجول','wind',2,1,0],
+['ماجراجو','wind',2,1,0],['بلندپرواز','wind',1.5,.5,0],['رقابت','wind',1.5,.5,0],
+['خارش','wind',2.5,0,0],['خارش سطحی','wind',3,0,0],
+['سرفه خشک','wind',2,0,0],['سرفه کوتاه','wind',2,0,0],
+['میگرن','wind',3,2,0],['سردرد','wind',1.5,.5,0],
+['درد مفصل','wind',2,1,0],['دررفتگی','wind',3,2,0],['مفاصل','wind',1,.5,0],
+['تهوع سفر','wind',3,1,1],['ماشین گرفتگ','wind',3,1,1],['حالت تهوع در سفر','wind',3,1,1],
+['آلرژی','wind',2.5,1,1],['حساسیت فصلی','wind',3,1,1],['آبریزش بینی','wind',2,1,0],['عطسه','wind',2,1,0],
+['بهار','wind',2.5,0,2],['ناخن','wind',2,1.5,0],['ناخن جو','wind',3,2,0],
+['شب‌بیدار','wind',1.5,0,0],['دیر خواب','wind',1.5,0,0],['ترشی','wind',2,0,1.5],['ترش','wind',1.5,0,1],
+['حرکات غیرارادی','wind',3,0,2],['حرکات غیرقابل کنترل','wind',3,0,2],
+['شب‌ادرار','wind',2.5,2,0],['بی‌اختیاری ادرار','wind',2.5,2,0],
+['حساس به صدا','wind',2,2,0],['حساس به بو','wind',2,2,0],['سروصدا','wind',1.5,1.5,0],
+['بی‌عدالتی','wind',1.5,.5,0],['خلاقیت','wind',1,0,0],['تخیل','wind',1,0,0],
+['کبد','wind',3,0,1],['کیسه صفرا','wind',3,1.5,0],['صفراوی','wind',2,1,0],
+['سکته مغزی','wind',2.5,2,0],['فلج صورت','wind',3,2,0],['فلج بل','wind',3,2,0],
+['ورزشکار','wind',1.5,2,0],['عضلات محکم','wind',1.5,2,0],['استخوان‌بندی','wind',1,1,0],
+['ناگهانی','wind',1.5,2,0],['ناپایدار','wind',1.5,1,0],
+/* ---------------- گرما ---------------- */
+['تپش قلب','heat',3.5,1,0],['طپش','heat',3.5,1,0],['ضربان بالا','heat',2.5,1,0],
+['اضطراب','heat',2,.5,0],['بی‌خواب','heat',2.5,.5,0],['بیخواب','heat',2.5,.5,0],
+['تعریق','heat',2.5,1,0],['عرق','heat',2,1,0],['گرگرفتگی','heat',3,2,0],
+['قرمزی صورت','heat',2.5,1,0],['برافروخته','heat',2.5,1,0],['گر گرفت','heat',3,2,0],
+['زخم دهان','heat',2.5,1,0],['آفت','heat',2.5,1,0],['التهاب','heat',2,1,0],
+['پرحرف','heat',2,.5,0],['اجتماعی','heat',1.5,0,0],['شاد','heat',1.5,0,0],['نمایشی','heat',1.5,.5,0],
+['تشنگی','heat',1.5,1,0],['گرمای بدن','heat',2,1,0],['تب','heat',2,2,0],
+['قلب','heat',2,0,0],['روده کوچک','heat',2,1,0],['کهیر','heat',2,1.5,0],['اگزمای مرطوب','heat',2,1,0],
+['خون‌دماغ','heat',2,1.5,0],['فشار خون بالا','heat',2,1.5,0],
+/* ---------------- داغی ---------------- */
+['خستگی مزمن','hotness',3,0,1],['فرسودگی','hotness',3,0,1],['برن‌اوت','hotness',3,0,1],
+['افت انرژی','hotness',2.5,0,1],['کار زیاد','hotness',2,0,0],['پرکار','hotness',2,1,0],
+['بی‌خوابی شدید','hotness',3,1,0],['کم‌خوابی','hotness',2,1,0],
+['کاریزم','hotness',2,1,0],['رهبر','hotness',2,1,0],['جاه‌طلب','hotness',2,1,0],['مدیر','hotness',1.5,1,0],
+['تمرکز','hotness',1.5,0,.5],['حافظه','hotness',2,0,1],['فراموش','hotness',2,0,1],
+['مغز ','hotness',2,0,0],['نخاع','hotness',2,1,0],['ام‌اس','hotness',2.5,0,1],['اماس','hotness',2.5,0,1],
+['دیسک','hotness',2,0,1],['ستون فقرات','hotness',1.5,0,.5],['بی‌حسی اندام','hotness',2,0,1],
+['وزوز گوش','hotness',1.5,1,0],['اعتماد به نفس','hotness',1.5,1,0],
+/* ---------------- رطوبت ---------------- */
+['چاق','humidity',3,0,1],['اضافه وزن','humidity',3,0,1],['افزایش وزن','humidity',3,0,1],
+['نفخ','humidity',3.5,0,1],['سنگینی','humidity',2.5,0,1],['ورم','humidity',3,0,1],['ادم','humidity',3,0,1],
+['پف','humidity',2.5,0,1],['احتباس','humidity',2.5,0,1],
+['خواب سنگین','humidity',2.5,0,1],['خواب‌آلود','humidity',2,0,1],['پرخواب','humidity',2,0,1],
+['وسواس','humidity',2.5,0,1],['نگرانی','humidity',2.5,0,.5],['نگران','humidity',2,0,.5],
+['مه مغزی','humidity',3,0,1],['ابهام ذهنی','humidity',3,0,1],['گیجی ذهن','humidity',2,0,1],
+['بلغم','humidity',3,0,1],['خلط','humidity',2.5,0,1],['سینوزیت','humidity',2,0,.5],
+['کیست','humidity',2.5,0,1],['فیبروم','humidity',2.5,0,1],['توده','humidity',2,0,1],
+['دیابت','humidity',2.5,0,1],['قند خون','humidity',2,0,1],['چربی خون','humidity',2,0,1],
+['معده','humidity',2,1,0],['طحال','humidity',2.5,0,0],['هضم','humidity',2,0,.5],['سوءهاضمه','humidity',2.5,0,.5],
+['شیرینی','humidity',2,0,1],['لبنیات','humidity',1.5,0,1],['اشتهای زیاد','humidity',1.5,1,0],
+['قاعدگی نامنظم','humidity',1.5,0,.5],['کیست تخمدان','humidity',3,0,1],['تیروئید کم‌کار','humidity',2.5,0,1.5],
+/* ---------------- خشکی ---------------- */
+['یبوست','dryness',3.5,0,1],['خشکی پوست','dryness',3,0,1],['پوست خشک','dryness',3,0,1],
+['خشکی چشم','dryness',2.5,0,1],['خشکی دهان','dryness',2,0,.5],['خشکی مو','dryness',2,0,1],
+['آسم','dryness',3,1,0],['تنگی نفس','dryness',2.5,1,0],['نفس','dryness',1.5,.5,0],
+['سرفه','dryness',1.5,0,0],['ریه','dryness',2.5,0,0],['روده بزرگ','dryness',2.5,1,0],
+['غم','dryness',3,0,1],['اندوه','dryness',3,0,1],['سوگ','dryness',3,0,1],['دلتنگ','dryness',2,0,1],
+['منطقی','dryness',1.5,0,0],['منظم','dryness',1.5,0,.5],['کمال‌گرا','dryness',2,0,.5],
+['وقت‌شناس','dryness',1.5,0,0],['محتاط','dryness',1.5,0,.5],['گذشته','dryness',1.5,0,1],
+['لاغر','dryness',2,0,.5],['اگزما','dryness',2,0,.5],['پسوریازیس','dryness',2.5,0,1],
+['ترک پاشنه','dryness',2.5,0,1],['شوره','dryness',2,0,.5],['آرتروز','dryness',2,0,1],
+/* ---------------- سرما ---------------- */
+['ریزش مو','coldness',3,0,1],['کم‌مویی','coldness',2.5,0,1],['طاسی','coldness',2.5,0,1],
+['کمردرد','coldness',3,0,1],['درد کمر','coldness',3,0,1],['کلیه','coldness',3,0,0],['مثانه','coldness',2.5,1,0],
+['افسردگی','coldness',3,0,1.5],['بی‌حوصلگ','coldness',2,0,1],['بی‌انگیزگ','coldness',2.5,0,1],
+[' ترس','coldness',3,0,1],['ترسو','coldness',2.5,0,1],['ترسید','coldness',2,0,1],['وحشت','coldness',2.5,1,0],['فوبیا','coldness',2.5,0,1],['اضطراب آینده','coldness',2.5,0,1],
+['سردی دست','coldness',3,0,1],['سردی','coldness',2,0,1],['سرد و','coldness',1.5,0,1],['سرد است','coldness',2,0,1],['سرمایی','coldness',3,0,1],
+['تکرر ادرار','coldness',2.5,0,1],['ناتوانی جنسی','coldness',3,0,1.5],['کاهش میل جنسی','coldness',2.5,0,1.5],
+['ناباروری','coldness',2.5,0,1],['زانو درد','coldness',2,0,1],['پوکی استخوان','coldness',3,0,1.5],
+['کم‌شنوایی','coldness',2,0,1],['وزوز','coldness',1.5,0,.5],['انزوا','coldness',2,0,1],['گوشه‌گیر','coldness',2,0,1],
+['رازدار','coldness',1.5,0,.5],['درون‌گرا','coldness',1.5,0,.5],['یائسگی','coldness',2,0,1],
+['کم‌کاری تیروئید','coldness',2,0,1.5],['سالمند','coldness',1,0,.5]
+];
+
+/* نشانگرهای عمومی یین/یانگ */
+const YY = [
+['ناگهان','y',2],['حاد','y',2],['شدید','y',1.5],['حمله','y',1.5],['تند','y',1],['سریع','y',1],
+['پرانرژی','y',1.5],['پرصدا','y',1],['قرمز','y',1],['گرم','y',1],['تشدید با حرکت','y',1.5],
+['مزمن','n',2],['تدریج','n',2],['طولانی','n',1.5],['ساله است که','n',1],['سال‌هاست','n',1.5],
+['ضعف','n',1.5],['خستگی','n',1],['آهسته','n',1],[' پایدار','n',1.5],['قابل پیش‌بینی','n',1.5],
+['بدتر با استراحت','n',1],['تشدید در شب','n',1],['رنگ‌پریده','n',1.5],['سردی','n',1.5],['سرمایی','n',1.5]
+];
+
+/* چک‌لیست نشانه‌ها */
+const CHECKS = [
+['ساختار بدنی و ظاهر',[
+ ['لاغر با استخوان‌بندی محکم و ورزیده','wind',2,1,0],
+ ['تناسب اندام، پوست گرم مایل به قرمز','heat',2,1,0],
+ ['هیکل سنگین ولی چابک، پوست براق','hotness',2,0,0],
+ ['چاق، نرم به لمس، پوست مایل به زرد','humidity',2.5,0,1],
+ ['لاغر و استخوانی، پوست خشک و رنگ‌پریده','dryness',2.5,0,1],
+ ['بدن ضعیف و شکننده، پوست سرد و تیره','coldness',2.5,0,1]]],
+['رفتار و شخصیت',[
+ ['سلطه‌جو، عجول، رقابتی، تکانشی','wind',2,1.5,0],
+ ['اجتماعی، پرحرف، نمایشی، جسور','heat',2,1,0],
+ ['رهبر، جاه‌طلب، کاریزماتیک، خودکنترل','hotness',2,1,0],
+ ['حمایتگر، صبور، سنتی، نگران','humidity',2,0,.5],
+ ['منظم، منطقی، محتاط، کمال‌گرا','dryness',2,0,.5],
+ ['درون‌گرا، ترسو، منزوی، رازدار','coldness',2,0,1]]],
+['خواب و اشتها',[
+ ['شب‌بیدار / دیرخواب، علاقه به ترشی','wind',2,0,1],
+ ['سحرخیز، رویاپرداز، ۵-۷ ساعت، علاقه به تندی','heat',2,1,0],
+ ['خواب سبک و کم‌عمق ۴-۵ ساعت','hotness',2,1,0],
+ ['خواب سنگین ۷-۸ ساعت، خواب‌آلودگی بعد غذا','humidity',2,0,1],
+ ['بی‌خوابی نیمه‌شب، سحرخیز','dryness',2,0,1],
+ ['خواب‌آلودگی روزانه، خواب عمیق ۱۰ ساعت','coldness',2,0,1]]],
+['احساس غالب',[
+ ['خشم و زودرنجی','wind',2.5,1,0],
+ ['شادی و هیجان افراطی','heat',2.5,1,0],
+ ['جاه‌طلبی و نیاز به رهبری','hotness',2.5,1,0],
+ ['نگرانی مزمن و وسواس','humidity',2.5,0,1],
+ ['غم و اندوه و سوگ','dryness',2.5,0,1],
+ ['ترس و اضطراب آینده','coldness',2.5,0,1]]],
+['علائم عدم تعادل (طبق جزوه)',[
+ ['درد، سرگیجه، اسپاسم عضلانی، تیک عصبی، شروع ناگهانی','wind',3,1,0],
+ ['بی‌خوابی، اضطراب، تپش قلب، تعریق مفرط','heat',3,1,0],
+ ['بی‌خوابی شدید، افت شدید انرژی، خستگی مزمن','hotness',3,0,1],
+ ['نفخ، سنگینی خواب، وسواس فکری، مه مغزی','humidity',3,0,1],
+ ['یبوست، مشکلات تنفسی، خشکی پوست','dryness',3,0,1],
+ ['ریزش مو، ضعف کلیه، کمردرد، افسردگی','coldness',3,0,1]]],
+['رنگ محبوب (سؤال ۱۹ جزوه)',[
+ ['سبز 🟢','wind',3,2,0],['قرمز 🔴','heat',3,2,0],['نارنجی 🟠','hotness',3,2,0],
+ ['زرد 🟡','humidity',3,2,0],['قهوه‌ای 🟤','dryness',3,2,0],['آبی 🔵','coldness',3,2,0]]]
+];
+
+/* =========================================================================
+   بخش ۳ — پرسشنامه ۳۸ سؤالی باد (عیناً از جزوه)
+   y = اثر پاسخ «بله» ، n = اثر پاسخ «خیر»
+   ========================================================================= */
+const Q = [
+ {i:1,  t:'آیا بیمار دارای بدنی ورزشی و عضلانی است؟', y:{w:2,yang:2}, lab:'یانگ باد +'},
+ {i:2,  t:'آیا بیمار ویژگی‌های بی‌قراری، تکان دادن پاها، و رفتار کودکانه دارد؟', y:{w:2.5}, lab:'باد +'},
+ {i:3,  t:'آیا بیمار قوه تخیل خوبی دارد؟ (خلاقیت یا حس کاذب خودبزرگ‌بینی)', y:{w:2}, lab:'باد +'},
+ {i:4,  t:'آیا بیمار زودرنج است؟', y:{w:2.5}, lab:'باد +'},
+ {i:5,  t:'آیا بیمار فردی متواضع است؟', n:{w:2}, lab:'اگر «خیر» (یعنی مغرور) ← باد +', inv:true},
+ {i:6,  t:'آیا بیمار در تصمیم‌گیری دچار تردید است و نمی‌داند چه می‌خواهد؟', y:{w:2.5}, lab:'باد +'},
+ {i:7,  t:'آیا بیمار ماجراجو است؟', y:{w:2}, lab:'باد +'},
+ {i:8,  t:'آیا بیمار دچار حملات خارش سطحی است که با خراشیدن بیشتر می‌شود؟', y:{w:3}, lab:'باد +'},
+ {i:9,  t:'آیا بیمار دچار سرفه‌های خشک کوتاه‌مدت می‌شود؟', y:{w:2.5}, lab:'باد +'},
+ {i:10, t:'آیا بیمار به چیزهای ترش حساسیت دارد؟', y:{w:2.5}, lab:'باد +'},
+ {i:11, t:'آیا بیمار دارای ساختار بدنی قوی و عضلات محکم است؟', y:{w:2,yang:2}, lab:'یانگ باد +'},
+ {i:12, t:'آیا بیمار دچار حملات صرع یا سرگیجه می‌شود؟', y:{w:3.5,yang:2.5}, lab:'یانگ باد +'},
+ {i:13, t:'اگر بیمار دچار لرزش است، نوع آن چگونه است؟', type:'ab',
+        a:'چیزی که در دست دارد می‌افتد', b:'با وجود لرزش، هنوز می‌تواند آن را نگه دارد',
+        ya:{w:3,yang:2.5}, yb:{w:3,yin:2.5}, lab:'الف ← یانگ باد + | ب ← یین باد +'},
+ {i:14, t:'آیا بیمار در انجام کارهای ظریف (مثل نوشتن) دچار گرفتگی انگشتان می‌شود؟', y:{w:1,yang:-2}, lab:'کاهش یانگ باد (−)'},
+ {i:15, t:'آیا بیمار دچار شب‌ادراری یا بی‌اختیاری ادرار است؟', y:{w:2.5,yang:2}, lab:'یانگ باد +'},
+ {i:16, t:'آیا سرعت راه رفتن بیمار ناپایدار است یا تغییر می‌کند؟', y:{w:2.5,yang:2}, lab:'یانگ باد +'},
+ {i:17, t:'آیا عضلات بازکننده (expansion muscles) در بدن ضعیف هستند؟', y:{w:1,yang:-2.5}, lab:'کاهش یانگ باد (−)'},
+ {i:18, t:'آیا عضلات منقبض‌کننده (contraction muscles) در بدن ضعیف هستند؟', y:{w:1,yin:-2.5}, lab:'کاهش یین باد (−)'},
+ {i:19, t:'رنگ مورد علاقه بیمار چیست؟', type:'color', lab:'سبز ← کاهش یانگ باد | قرمز ← کاهش یانگ گرما | نارنجی ← کاهش یانگ داغی | زرد ← کاهش یانگ رطوبت | قهوه‌ای ← کاهش یانگ خشکی | آبی ← کاهش یانگ سرما'},
+ {i:20, t:'آیا بیمار دچار بیماری‌های تنفسی آلرژیک است؟', y:{w:2.5,yang:2,yin:-1}, lab:'یانگ باد + / یین باد −'},
+ {i:21, t:'آیا در زمان عصبانیت (کوتاه مدت) اشیاء را پرت می‌کنید یا فریاد می‌زنید؟', y:{w:2.5,yang:2.5}, lab:'یانگ باد +'},
+ {i:22, t:'آیا در ناراحتی اخم می‌کنید و اتفاقات بد را مدت‌ها به یاد می‌سپارید؟', y:{w:2.5,yin:2.5}, lab:'یین باد +'},
+ {i:23, t:'آیا تمایل به انتقام گرفتن دارید؟', y:{w:2.5,yin:2.5}, lab:'یین باد +'},
+ {i:24, t:'آیا ناخن‌هایتان را می‌جوید؟', y:{w:2,yang:2}, lab:'یانگ باد +'},
+ {i:25, t:'آیا دچار حرکات غیرقابل کنترل یا لرزش اندام‌ها هستید؟', y:{w:3,yin:2.5}, lab:'یین باد +'},
+ {i:26, t:'نوع آلرژی شما چگونه است؟', type:'ab',
+        a:'ناگهانی و کوتاه‌مدت', b:'قابل پیش‌بینی و پایدار',
+        ya:{w:2.5,yang:2.5}, yb:{w:2.5,yin:2.5}, lab:'الف ← یانگ باد + | ب ← یین باد +'},
+ {i:27, t:'آیا علائم در فصل بهار تشدید می‌شوند؟', y:{w:3,yin:2.5}, lab:'یین باد +'},
+ {i:28, t:'آیا دچار سرگیجه‌های ناگهانی منجر به زمین خوردن می‌شوید؟', y:{w:3.5,yang:2.5}, lab:'یانگ باد +'},
+ {i:29, t:'آیا زیاد دچار میگرن می‌شوید؟', y:{w:3,yang:2}, lab:'یانگ باد +'},
+ {i:30, t:'آیا صبح‌ها با احساس ضعف و خستگی بیدار می‌شوید؟', y:{w:2,liverDef:true}, lab:'کاهش مریدین کبد (Liver Meridian Deficiency)'},
+ {i:31, t:'آیا راه رفتن برایتان سخت است؟', y:{w:1,yin:-2.5}, lab:'یین باد −'},
+ {i:32, t:'آیا دویدن برایتان سخت است؟', y:{w:1,yang:-2.5}, lab:'یانگ باد −'},
+ {i:33, t:'آیا می‌توانید مسافت طولانی بدون توقف بدوید؟', y:{w:1.5,yang:2}, lab:'یانگ باد +'},
+ {i:34, t:'آیا نسبت به صدا یا بو حساس هستید؟', y:{w:2,yang:2}, lab:'یانگ باد +'},
+ {i:35, t:'آیا طعم ترش مداوم در دهان دارید یا به ترشی حساسید؟', y:{w:2.5,yin:2}, lab:'یین باد +'},
+ {i:36, t:'آیا مکرراً دچار دررفتگی مفاصل می‌شوید؟', y:{w:3,yang:2}, lab:'یانگ باد +'},
+ {i:37, t:'آیا رانندگی با سرعت بالا را دوست دارید / بی‌احتیاط رانندگی می‌کنید؟', y:{w:2,yang:2}, lab:'یانگ باد +'},
+ {i:38, t:'آیا هنگام سفر با وسایل نقلیه دچار حالت تهوع می‌شوید؟', y:{w:3,yang:1.5,yin:1.5}, lab:'یانگ باد + / یین باد # (بیماری باد)'}
+];
+
+/* =========================================================================
+   بخش ۴ — کتابخانه شرح حال‌ها
+   ========================================================================= */
+const CASES = [
+ {g:'موارد مستند جزوه', t:'مورد ۱ — سرگیجه و افزایش انرژی باد (یانگ باد)', age:60, sex:'f', course:'chronic',
+  x:'خانم ۶۰ ساله با حملات مکرر سرگیجه چرخشی همراه با اختلال بینایی. تشدید با بلند شدن از رختخواب، حرکت سر و محیط پر سروصدا. سابقه التهاب کیسه صفرا و یبوست. حملات ناگهانی و کوتاه‌مدت هستند و گاهی منجر به زمین خوردن می‌شود.',
+  q:{12:'y',28:'y',34:'y',36:'n'}, note:'تشخیص جزوه: غلبه انرژی باد (Excess Wind Energy) — یانگ'},
+ {g:'موارد مستند جزوه', t:'مورد ۲ — تیک عصبی و عدم تعادل انرژی باد', age:34, sex:'f', course:'chronic',
+  x:'زن ۳۴ ساله با تیک عصبی (پرش پلک پایین چشم چپ) که با استرس و خستگی تشدید شده و ناگهان ظاهر و ناپدید می‌شود. باد و سرما وضعیت را بدتر می‌کند. پرش ماهیچه‌ای در نواحی دیگر هم گاهی دیده می‌شود.',
+  q:{25:'y',22:'y'}, note:'تشخیص جزوه: بیماری باد (Wind Energy Imbalance)'},
+ {g:'موارد مستند جزوه', t:'مورد ۳ — آلرژی بهاری و افزایش یانگ باد', age:28, sex:'f', course:'chronic',
+  x:'زن ۲۸ ساله با آلرژی بهاری شامل خارش پلک و آبریزش بینی. شخصیتی چابک، عجول، با حرکات و گفتار سریع و ناگهانی دارد. بدن او لاغر است. علائم در فصل بهار تشدید می‌شود.',
+  q:{20:'y',26:'a',27:'y',8:'y'}, note:'تشخیص جزوه: افزایش یانگ باد (Yang Wind Excess) — نکته: لاغری و تشدید منظم علائم در بهار نشان‌دهنده ریشه‌های یین باد نیز هست'},
+
+ {g:'سر و اعصاب', t:'میگرن مزمن با حساسیت به نور و صدا', age:35, sex:'f', course:'chronic',
+  x:'خانم ۳۵ ساله با میگرن مکرر یک‌طرفه، حساس به صدا و بو، همراه با تهوع. علائم پیش از قاعدگی و در زمان عصبانیت تشدید می‌شود. زودرنج و عجول است و در عصبانیت فریاد می‌زند.', q:{29:'y',34:'y',21:'y',4:'y'}},
+ {g:'سر و اعصاب', t:'سردرد تنشی و فرسودگی شغلی', age:41, sex:'m', course:'chronic',
+  x:'مرد ۴۱ ساله مدیر، سردرد تنشی روزانه، خستگی مزمن، بی‌خوابی شدید و افت انرژی. کار زیاد و جاه‌طلبی بالا، خواب ۴ تا ۵ ساعت. ذهن هرگز خاموش نمی‌شود.', q:{}},
+ {g:'سر و اعصاب', t:'بی‌خوابی و اضطراب با تپش قلب', age:29, sex:'f', course:'chronic',
+  x:'خانم ۲۹ ساله با بی‌خوابی، اضطراب، تپش قلب و تعریق مفرط. پرحرف و اجتماعی است، صورت برافروخته و گر گرفتگی دارد. علاقه به غذای تند.', q:{}},
+ {g:'سر و اعصاب', t:'وزوز گوش و ضعف حافظه', age:58, sex:'m', course:'chronic',
+  x:'مرد ۵۸ ساله با وزوز گوش، کاهش حافظه، کمردرد و ریزش مو. سرمایی است و شب‌ها تکرر ادرار دارد. درون‌گرا و کم‌حوصله شده است.', q:{}},
+
+ {g:'گوارش', t:'یبوست مزمن و خشکی پوست', age:47, sex:'f', course:'chronic',
+  x:'خانم ۴۷ ساله با یبوست مزمن چند ساله، خشکی شدید پوست و ترک پاشنه، پوست رنگ‌پریده. فردی منظم، منطقی و کمال‌گراست. مدتی است احساس اندوه و دلتنگی دارد.', q:{}},
+ {g:'گوارش', t:'نفخ و سنگینی بعد از غذا', age:38, sex:'f', course:'chronic',
+  x:'خانم ۳۸ ساله با نفخ دائمی، سنگینی و خواب‌آلودگی بعد از غذا، اضافه وزن و پف صورت. نگران و وسواسی است و مه مغزی دارد. علاقه شدید به شیرینی و لبنیات.', q:{}},
+ {g:'گوارش', t:'سندرم روده تحریک‌پذیر با استرس', age:32, sex:'m', course:'chronic',
+  x:'مرد ۳۲ ساله با درد شکم، اسپاسم روده و تناوب یبوست و اسهال که کاملاً با استرس و عصبانیت مرتبط است. عجول و تکانشی است، ناخن می‌جود.', q:{4:'y',24:'y',6:'y'}},
+ {g:'گوارش', t:'رفلاکس و ترشی دهان', age:44, sex:'m', course:'chronic',
+  x:'مرد ۴۴ ساله با رفلاکس معده، طعم ترش مداوم در دهان، سوزش سر دل. زودعصبانی، اما کینه را مدت‌ها نگه می‌دارد. سابقه التهاب کیسه صفرا.', q:{35:'y',22:'y',23:'y'}},
+
+ {g:'پوست و آلرژی', t:'آلرژی فصلی بهاری با عطسه و آبریزش', age:26, sex:'m', course:'chronic',
+  x:'مرد ۲۶ ساله با عطسه‌های پیاپی، آبریزش بینی و خارش چشم که هر سال در بهار شروع می‌شود و قابل پیش‌بینی است. بدن لاغر، حرکات سریع.', q:{20:'y',26:'b',27:'y'}},
+ {g:'پوست و آلرژی', t:'کهیر ناگهانی و خارش سطحی', age:31, sex:'f', course:'acute',
+  x:'خانم ۳۱ ساله با حملات ناگهانی کهیر و خارش سطحی که با خراشیدن بدتر می‌شود. حملات کوتاه‌مدت و بی‌مقدمه‌اند. پوست گرم و برافروخته می‌شود.', q:{8:'y',26:'a'}},
+ {g:'پوست و آلرژی', t:'اگزمای خشک و پسوریازیس', age:39, sex:'f', course:'chronic',
+  x:'خانم ۳۹ ساله با اگزمای خشک و پوسته‌ریزی روی آرنج و زانو، خشکی شدید پوست و مو، یبوست همراه. کمال‌گرا و منظم است، سابقه سوگ حل‌نشده دارد.', q:{}},
+
+ {g:'اسکلتی و عضلانی', t:'کمردرد مزمن با ضعف زانو', age:55, sex:'m', course:'chronic',
+  x:'مرد ۵۵ ساله با کمردرد مزمن، درد زانو، سردی دست و پا و ریزش مو. صبح‌ها با ضعف بیدار می‌شود. سرمایی و کم‌انگیزه است.', q:{30:'y'}},
+ {g:'اسکلتی و عضلانی', t:'گرفتگی و اسپاسم عضلانی مکرر', age:36, sex:'m', course:'chronic',
+  x:'مرد ۳۶ ساله ورزشکار با عضلات محکم، دچار گرفتگی و اسپاسم مکرر عضلات ساق و دررفتگی مکرر مفصل شانه. رانندگی پرسرعت را دوست دارد.', q:{1:'y',11:'y',36:'y',37:'y'}},
+ {g:'اسکلتی و عضلانی', t:'لرزش دست و حرکات غیرارادی', age:62, sex:'m', course:'chronic',
+  x:'مرد ۶۲ ساله با لرزش دست‌ها؛ با وجود لرزش هنوز می‌تواند اشیاء را نگه دارد. حرکات غیرقابل کنترل خفیف در اندام‌ها. علائم در بهار بدتر می‌شود.', q:{13:'b',25:'y',27:'y'}},
+ {g:'اسکلتی و عضلانی', t:'آرتروز و خشکی مفاصل', age:64, sex:'f', course:'chronic',
+  x:'خانم ۶۴ ساله با آرتروز، خشکی و صدای مفاصل، پوست خشک و تیره، مستعد یبوست. لاغراندام، متفکر و گوشه‌گیر.', q:{}},
+
+ {g:'زنان و غدد', t:'کیست تخمدان و قاعدگی نامنظم', age:27, sex:'f', course:'chronic',
+  x:'خانم ۲۷ ساله با کیست تخمدان، قاعدگی نامنظم، اضافه وزن، نفخ و احتباس آب. خواب سنگین و خواب‌آلودگی روزانه دارد. نگران و وسواسی.', q:{}},
+ {g:'زنان و غدد', t:'کم‌کاری تیروئید با خستگی و سرمایی', age:43, sex:'f', course:'chronic',
+  x:'خانم ۴۳ ساله با کم‌کاری تیروئید، خستگی، سرمایی بودن شدید، ریزش مو، افزایش وزن و افسردگی. پوست خشک و سرد.', q:{}},
+ {g:'زنان و غدد', t:'یائسگی با گرگرفتگی و بی‌خوابی', age:51, sex:'f', course:'chronic',
+  x:'خانم ۵۱ ساله در یائسگی با گرگرفتگی، تعریق شبانه، تپش قلب و بی‌خوابی. همزمان کمردرد و خشکی پوست دارد و زودرنج شده است.', q:{}},
+
+ {g:'روان و خلق', t:'افسردگی با انزوا و ترس از آینده', age:45, sex:'m', course:'chronic',
+  x:'مرد ۴۵ ساله با افسردگی، بی‌انگیزگی، انزوا و ترس مداوم از آینده. سردی دست و پا، خواب زیاد، کاهش میل جنسی. رازدار و درون‌گراست.', q:{}},
+ {g:'روان و خلق', t:'وسواس فکری و نشخوار ذهنی', age:33, sex:'f', course:'chronic',
+  x:'خانم ۳۳ ساله با وسواس فکری، نگرانی مداوم و مه مغزی. تصمیم‌گیری برایش دشوار است. اضافه وزن و نفخ دارد و خواب سنگین.', q:{6:'y'}},
+ {g:'روان و خلق', t:'حملات خشم انفجاری', age:30, sex:'m', course:'acute',
+  x:'مرد ۳۰ ساله با حملات خشم کوتاه‌مدت که در آن اشیاء را پرت می‌کند و فریاد می‌زند. عضلانی و ورزشکار، ماجراجو و رقابتی. ناخن می‌جود.', q:{21:'y',1:'y',7:'y',24:'y'}},
+ {g:'روان و خلق', t:'اندوه مزمن پس از سوگ', age:49, sex:'f', course:'chronic',
+  x:'خانم ۴۹ ساله با اندوه مزمن پس از فوت همسر، تنگی نفس و آه کشیدن مکرر، یبوست و خشکی پوست. گذشته‌نگر و منزوی شده است.', q:{}}
+];
+
+/* =========================================================================
+   بخش ۵ — موتور تحلیل
+   ========================================================================= */
+const norm = s => (s||'').toString()
+  .replace(/[‌‏‎]/g,'')
+  .replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/ۀ/g,'ه')
+  .replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+  .replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+  .toLowerCase();
+const fa = n => (Math.round(n*10)/10).toString().replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const faInt = n => Math.round(n).toString().replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+
+const state = {q:{}, checks:new Set()};
+
+function ageEnergy(a){
+  if(!a) return null;
+  if(a<13) return 'wind'; if(a<24) return 'heat'; if(a<36) return 'hotness';
+  if(a<48) return 'humidity'; if(a<60) return 'dryness'; return 'coldness';
+}
+
+function analyze(){
+  const raw = document.getElementById('hx').value;
+  const t = norm(raw);
+  const age = parseInt(document.getElementById('age').value)||null;
+  const sex = document.getElementById('sex').value;
+  const course = document.getElementById('course').value;
+
+  const s = {wind:0,heat:0,hotness:0,humidity:0,dryness:0,coldness:0};
+  let yang=0, yin=0, liverDef=false;
+  const hits = [];
+
+  /* متن آزاد */
+  LEX.forEach(([k,e,w,ya,yi])=>{
+    if(t.includes(norm(k))){ s[e]+=w; yang+=ya||0; yin+=yi||0; hits.push({k,e,w}); }
+  });
+  YY.forEach(([k,d,w])=>{ if(t.includes(norm(k))){ d==='y'?yang+=w:yin+=w; } });
+
+  /* چک‌لیست */
+  state.checks.forEach(id=>{
+    const [gi,ii]=id.split('-').map(Number);
+    const [lbl,e,w,ya,yi]=CHECKS[gi][1][ii];
+    s[e]+=w; yang+=ya||0; yin+=yi||0; hits.push({k:lbl,e,w,chk:true});
+  });
+
+  /* پرسشنامه */
+  let qAnswered=0;
+  Q.forEach(q=>{
+    const a = state.q[q.i]; if(!a) return; qAnswered++;
+    if(q.type==='color'){
+      const map={green:'wind',red:'heat',orange:'hotness',yellow:'humidity',brown:'dryness',blue:'coldness'};
+      const [c,mode]=a.split(':');
+      if(map[c]){ if(mode==='hate'){ s[map[c]]+=2; yin+=.5; } else { s[map[c]]+=3; yang+=2; } }
+      return;
+    }
+    if(q.type==='ab'){
+      const eff = a==='a'?q.ya:q.yb; if(!eff) return;
+      s.wind+=eff.w||0; yang+=eff.yang||0; yin+=eff.yin||0; return;
+    }
+    const eff = a==='y'? q.y : (a==='n'? q.n : null); if(!eff) return;
+    s.wind+=eff.w||0; yang+=eff.yang||0; yin+=eff.yin||0;
+    if(eff.liverDef) liverDef=true;
+  });
+
+  /* سن و سیر */
+  const ae = ageEnergy(age); if(ae) s[ae]+=1.2;
+  if(course==='acute') yang+=2.5; if(course==='chronic') yin+=2.5;
+
+  const total = EK.reduce((a,k)=>a+s[k],0)||1;
+  const sorted = EK.slice().sort((a,b)=>s[b]-s[a]);
+  const p1 = sorted[0], p2 = sorted[1];
+  const hasSecondary = s[p2] >= s[p1]*0.45 && s[p2]>1.5;
+
+  const yyTotal = yang+yin;
+  const isYang = yang >= yin;
+  const yangPct = yyTotal>0 ? Math.round(yang/yyTotal*100) : 50;
+  const decisive = yyTotal>0 ? Math.abs(yang-yin)/yyTotal : 0;
+
+  /* مزاج ایرانی */
+  const hotS = s.heat + s.hotness + 0.5*s.wind;
+  const coldS = s.coldness + 0.5*s.humidity;
+  const dryS = s.dryness + 0.5*s.wind;
+  const wetS = s.humidity + 0.4*s.heat;
+  const isHot = hotS>=coldS, isDry = dryS>=wetS;
+  const tk = isHot ? (isDry?'choleric':'sanguine') : (isDry?'melancholic':'phlegmatic');
+
+  return {s,total,p1,p2,hasSecondary,yang,yin,isYang,yangPct,decisive,tk,age,sex,course,raw,hits,liverDef,qAnswered,ae};
+}
+
+/* فرمول شاخه‌ای — الگوی جزوه (تأییدشده روی فرمول باد) */
+function branchFormula(e, isYang){
+  const own=E[e], ax=E[AXIS[e]], ch=E[CHILD[e]];
+  const O = k => isYang ? E[k].yangOrgan : E[k].yinOrgan;
+  const Oen = k => isYang ? E[k].yangOrganEn : E[k].yinOrganEn;
+  return [
+    {d:'dn', txt:`کاهش <b>${own.fa}</b> در <b>${O(e)}</b>`, en:`Decrease ${own.en} — ${Oen(e)}`,
+     why:'سدیت کردن انرژی مازاد در اندام خودِ انرژی'},
+    {d:'up', txt:`افزایش <b>${ax.fa}</b> در <b>${O(AXIS[e])}</b>`, en:`Increase ${ax.en} — ${Oen(AXIS[e])}`,
+     why:`قانون محور — ${ax.fa} انرژی مقابل ${own.fa} روی چرخه ۶ انرژی است`},
+    {d:'up', txt:`افزایش <b>${ch.fa}</b> در <b>${O(CHILD[e])}</b>`, en:`Increase ${ch.en} — ${Oen(CHILD[e])}`,
+     why:`تخلیه مادر از طریق فرزند — ${own.fa} مولد ${ch.fa} است`},
+    {d:'dn', txt:`کاهش <b>${own.fa}</b> در <b>${isYang?'نخاع':'مغز'}</b>`, en:`Decrease ${own.en} — ${isYang?'Spinal Cord':'Brain'}`,
+     why:'تنظیم سطح مرکزی (آتش ثانویه)'}
+  ];
+}
+
+/* =========================================================================
+   بخش ۶ — رندر خروجی ۹ محوری
+   ========================================================================= */
+function render(){
+  const r = analyze();
+  if(!r.raw.trim() && !state.checks.size && !r.qAnswered){
+    alert('لطفاً شرح حال را وارد کنید یا حداقل چند نشانه را تیک بزنید.'); return;
+  }
+  const P=E[r.p1], S=E[r.p2], T=TEMP[r.tk];
+  const yangW = r.isYang, ynFa = yangW?'یانگ':'یین', ynEn = yangW?'Yang':'Yin';
+  const organ = yangW?P.yangOrgan:P.yinOrgan, organEn = yangW?P.yangOrganEn:P.yinOrganEn;
+  const AX=E[AXIS[r.p1]], CT=E[CONTROLLED[r.p1]], CH=E[CHILD[r.p1]];
+  const isBooklet = r.p1==='wind';
+  const srcTag = isBooklet? '<span class="tag src">جزوه</span>' : '<span class="tag der2">استنتاج از الگوی جزوه</span>';
+  const reps = r.sex==='m' ? '۳ بار' : '۲ بار';
+
+  let h='';
+
+  /* ===== HERO ===== */
+  h+=`<div class="hero">
+    <div class="ttl">تشخیص غالب</div>
+    <div class="main" style="color:${P.hex}">غلبه انرژی ${P.fa} — ${ynFa}</div>
+    <div class="en">${ynEn} ${P.en} Excess · عنصر ${P.el} (${P.elEn}) · اندام درگیر: ${organ} (${organEn})</div>
+    <div class="pills">
+      <span class="pill" style="border-color:${P.hex};color:${P.hex}">انرژی اصلی: ${P.fa}</span>
+      ${r.hasSecondary?`<span class="pill" style="border-color:${S.hex};color:${S.hex}">انرژی ثانویه: ${S.fa}</span>`:''}
+      <span class="pill" style="border-color:${yangW?'var(--yang)':'var(--yin)'};color:${yangW?'var(--yang)':'var(--yin)'}">${ynFa} ${faInt(r.yangPct)}٪ / ${faInt(100-r.yangPct)}٪</span>
+      <span class="pill" style="border-color:var(--gold);color:var(--gold)">مزاج: ${T.fa}</span>
+      <span class="pill" style="border-color:${P.hex};color:${P.hex}">رنگ درمانی: ${P.colorFa}<span class="sw" style="background:${P.hex}"></span></span>
+    </div>
+    <div class="bars" style="margin-top:16px">${
+      EK.slice().sort((a,b)=>r.s[b]-r.s[a]).map(k=>{
+        const pct = Math.min(100, r.s[k]/(r.s[r.p1]||1)*100);
+        return `<div class="bar"><div>${E[k].fa} <span style="color:var(--tx3);font-size:11px">${E[k].en}</span></div>
+        <div class="tr"><div class="fl" style="width:${pct}%;background:${E[k].hex}"></div></div>
+        <div class="vv">${fa(r.s[k])}</div></div>`;}).join('')
+    }</div>
+    <div class="bar" style="margin-top:10px">
+      <div>یانگ / یین</div>
+      <div class="tr" style="display:flex"><div style="width:${r.yangPct}%;background:var(--yang)"></div><div style="flex:1;background:var(--yin)"></div></div>
+      <div class="vv">${faInt(r.yangPct)}٪</div>
+    </div>
+    ${r.decisive<0.15?'<div class="note" style="margin-top:12px">⚖ اختلاف یین و یانگ کم است. برای قطعیت، پرسشنامه ۳۸ سؤالی (به‌ویژه سؤالات ۱۳، ۲۱، ۲۲، ۲۳، ۲۶، ۲۷) را تکمیل کنید.</div>':''}
+  </div>`;
+
+  /* ===== تحلیل شرح حال ===== */
+  h+=`<div class="card"><h2><span class="n">◎</span> بررسی شرح حال و تحلیل بیماری</h2>`;
+  h+=`<p style="font-size:13.5px;background:#101a28;border-radius:10px;padding:12px 14px;border:1px solid var(--line)">${r.raw?r.raw.replace(/\n/g,'<br>'):'<i style="color:var(--tx3)">متن آزادی وارد نشده — تحلیل بر پایه چک‌لیست و پرسشنامه انجام شد.</i>'}</p>`;
+  h+=`<h3>الف) داده‌های پایه</h3><table><tr><th>سن</th><th>جنسیت</th><th>سیر</th><th>رده سنی انرژی (جزوه)</th><th>پاسخ پرسشنامه</th></tr>
+  <tr><td>${r.age?faInt(r.age):'—'}</td><td>${r.sex==='m'?'مرد':'زن'}</td>
+  <td>${r.course==='acute'?'حاد / ناگهانی ← گرایش یانگ':r.course==='chronic'?'مزمن / تدریجی ← گرایش یین':'نامشخص'}</td>
+  <td>${r.ae?E[r.ae].fa+' ('+E[r.ae].age+')':'—'}</td><td>${faInt(r.qAnswered)} سؤال</td></tr></table>`;
+
+  const shown = r.hits.slice().sort((a,b)=>b.w-a.w).slice(0,18);
+  h+=`<h3>ب) نشانه‌های شناسایی‌شده و انرژی متناظر</h3>`;
+  h+= shown.length? `<div>${shown.map(x=>`<span class="chk on" style="border-color:${E[x.e].hex};cursor:default">${x.k} <span style="color:${E[x.e].hex}">← ${E[x.e].fa}</span></span>`).join('')}</div>`
+    : `<p class="sub">نشانه کلیدواژه‌ای شناسایی نشد؛ تحلیل بر پایه پرسشنامه/چک‌لیست.</p>`;
+
+  h+=`<h3>ج) تفسیر بالینی</h3><ul class="li">`;
+  h+=`<li>مجموعه نشانه‌ها بیشترین هم‌خوانی را با پروفایل <b style="color:${P.hex}">انرژی ${P.fa} (${P.en})</b> دارد — عنصر ${P.el}، اندام‌های ${P.yinOrgan} و ${P.yangOrgan}.</li>`;
+  h+=`<li>علائم عدم تعادل ${P.fa} طبق جزوه: <b>${P.imbalance}</b></li>`;
+  if(r.hasSecondary) h+=`<li>لایه ثانویه <b style="color:${S.hex}">${S.fa}</b> نیز فعال است (${S.imbalance}) — درمان باید هر دو را پوشش دهد، ابتدا ${P.fa} سپس ${S.fa}.</li>`;
+  h+=`<li>سنجش یین/یانگ: گرایش <b>${ynFa}</b> با ${faInt(r.yangPct)}٪ یانگ. ${yangW?'الگوی یانگ: شروع ناگهانی، شدت بالا، حرکت به بیرون و بالا، تشدید با فعالیت.':'الگوی یین: شروع تدریجی، سیر مزمن و پایدار، حرکت به درون، تشدید با سرما و خستگی.'}</li>`;
+  if(r.liverDef) h+=`<li>⚠ پاسخ مثبت به سؤال ۳۰ جزوه ← <b>کاهش مریدین کبد (Liver Meridian Deficiency)</b>؛ پیش از سدیت کردن باد، مریدین کبد باید تقویت شود.</li>`;
+  h+=`</ul></div>`;
+
+  /* ===== ۱. مزاج ===== */
+  h+=`<div class="card"><h2><span class="n">۱</span> مزاج بیمار <span style="font-size:12px;color:var(--tx3)">(طب ایرانی — Unani)</span></h2>
+  <p class="sub">محاسبه بر دو محور گرمی/سردی و خشکی/تری از مجموع امتیاز ۶ انرژی.</p>
+  <div class="hero" style="margin:0 0 12px;background:linear-gradient(135deg,#26303f,#2c3a4e)">
+    <div class="ttl">مزاج غالب</div><div class="main" style="font-size:22px;color:var(--gold)">${T.fa}</div>
+    <div class="en">${T.en} · محور گرمی ${fa(hotColdLabel(r))} · محور رطوبت ${fa(dryWetLabel(r))}</div>
+  </div>
+  <table>
+    <tr><th style="width:110px">نشانه‌های جسمی</th><td>${T.phys}</td></tr>
+    <tr><th>نشانه‌های رفتاری</th><td>${T.behav}</td></tr>
+    <tr><th>توصیه غذایی <span class="tag src">جزوه</span></th><td><b>${T.diet}</b></td></tr>
+  </table>
+  <div class="note inf">اصل درمان در جزوه: هدف فقط رفع نشانه نیست، بلکه <b>اصلاح مزاج</b> است. تغذیه ضدمزاج (سرد برای مزاج گرم و برعکس) پایه‌ی همه‌ی مراحل بعدی است.</div></div>`;
+
+  /* ===== ۲. شش انرژی ===== */
+  h+=`<div class="card"><h2><span class="n">۲</span> درمان با شش انرژی <span style="font-size:12px;color:var(--tx3)">(6 Ki)</span></h2>
+  <table><tr><th style="width:120px">مؤلفه</th><th>انرژی اصلی</th>${r.hasSecondary?'<th>انرژی ثانویه</th>':''}</tr>
+   <tr><td>نام</td><td><b style="color:${P.hex}">${P.fa} (${P.en})</b></td>${r.hasSecondary?`<td><b style="color:${S.hex}">${S.fa} (${S.en})</b></td>`:''}</tr>
+   <tr><td>عنصر</td><td>${P.el} (${P.elEn})</td>${r.hasSecondary?`<td>${S.el} (${S.elEn})</td>`:''}</tr>
+   <tr><td>اندام یین</td><td>${P.yinOrgan} (${P.yinOrganEn})</td>${r.hasSecondary?`<td>${S.yinOrgan} (${S.yinOrganEn})</td>`:''}</tr>
+   <tr><td>اندام یانگ</td><td>${P.yangOrgan} (${P.yangOrganEn})</td>${r.hasSecondary?`<td>${S.yangOrgan} (${S.yangOrganEn})</td>`:''}</tr>
+   <tr><td>احساس غالب</td><td>${P.emotion}</td>${r.hasSecondary?`<td>${S.emotion}</td>`:''}</tr>
+   <tr><td>علائم عدم تعادل</td><td>${P.imbalance}</td>${r.hasSecondary?`<td>${S.imbalance}</td>`:''}</tr>
+   <tr><td>رنگ</td><td>${P.colorFa} <span class="sw" style="background:${P.hex}"></span></td>${r.hasSecondary?`<td>${S.colorFa} <span class="sw" style="background:${S.hex}"></span></td>`:''}</tr>
+  </table>
+  <h3>راهبرد کلی درمان با شش انرژی</h3><ol class="li">
+   <li><b>قانون محور:</b> انرژی مقابل ${P.fa} روی چرخه، <b style="color:${AX.hex}">${AX.fa} (${AX.en})</b> است. با تقویت ${AX.fa}، ${P.fa} مهار می‌شود.</li>
+   <li><b>قانون کنترل (چرخه مخرب) <span class="tag src">جزوه</span>:</b> با افزایش <b style="color:${CT.hex}">${CT.fa}</b>، ${P.fa} کاهش می‌یابد.</li>
+   <li><b>تخلیه از طریق فرزند:</b> تقویت <b style="color:${CH.hex}">${CH.fa}</b> (فرزند ${P.fa}) انرژی مازاد ${P.fa} را می‌کشد.</li>
+   <li><b>سدیت مستقیم:</b> کاهش ${P.fa} در اندام ${ynFa} یعنی <b>${organ}</b>.</li>
+  </ol></div>`;
+
+  /* ===== ۳. سطح شاخه‌ای ===== */
+  h+=`<div class="card"><h2><span class="n">۳</span> در سطح انرژی شاخه‌ای <span style="font-size:12px;color:var(--tx3)">(Branch Level)</span></h2>
+  <p class="sub">شاخه = سطح اندام‌ها و مریدین‌ها (تجلی فیزیکی)؛ در برابر ریشه = کانستیتوشن.</p>
+  <table>
+   <tr><th style="width:150px">مریدین درگیر اصلی</th><td><b>${organ} (${organEn})</b> — مریدین ${ynFa}</td></tr>
+   <tr><th>وضعیت</th><td>${yangW?'<b style="color:var(--yang)">غلبه / مازاد (Excess)</b> — انرژی به بیرون و بالا رانده می‌شود':'<b style="color:var(--yin)">تجمع و رکود (Stagnation)</b> — انرژی به درون حبس شده'}</td></tr>
+   <tr><th>مریدین جفت</th><td>${yangW?P.yinOrgan+' ('+P.yinOrganEn+')':P.yangOrgan+' ('+P.yangOrganEn+')'} — باید هم‌زمان پایش شود</td></tr>
+   <tr><th>مریدین محور</th><td>${yangW?AX.yangOrgan+' ('+AX.yangOrganEn+')':AX.yinOrgan+' ('+AX.yinOrganEn+')'} — هدف تقویت</td></tr>
+   <tr><th>سطح مرکزی</th><td>${yangW?'نخاع (Spinal Cord)':'مغز (Brain)'} — تنظیم آتش ثانویه</td></tr>
+  </table>
+  ${r.liverDef?'<div class="note">سؤال ۳۰ مثبت: کاهش مریدین کبد. در این حالت الگو «مازاد ظاهری روی زمینه کمبود» است — ابتدا تونینگ کبد، سپس سدیت باد.</div>':''}
+  <div class="note inf">در جزوه، شاخه محل اجرای عملی درمان است: نقاط دردناک اندام مربوطه روی <b>دست و پا</b> شناسایی و روزانه <b>۳ تا ۵ بار</b> ماساژ داده می‌شوند.</div></div>`;
+
+  /* ===== ۴. فرمول درمان شش انرژی شاخه‌ای ===== */
+  const F = branchFormula(r.p1, yangW);
+  h+=`<div class="card"><h2><span class="n">۴</span> فرمول درمان شش انرژی شاخه‌ای ${srcTag}</h2>
+  <p class="sub">فرمول کاهش <b>${ynFa} ${P.fa}</b> — ${isBooklet?'عیناً مطابق جدول جزوه':'ساخته‌شده با همان الگوی چهارگامی که جزوه برای باد ارائه کرده (سدیت خود انرژی ← تقویت محور ← تقویت فرزند ← تنظیم مرکزی)'}</p>
+  <div class="fx">${F.map((f,i)=>`<div class="step"><div class="i">${faInt(i+1)}</div>
+    <div><span class="${f.d}">${f.d==='up'?'⬆':'⬇'}</span> ${f.txt}
+    <div style="font-size:11.5px;color:var(--tx3)">${f.en} — ${f.why}</div></div></div>`).join('')}</div>`;
+  if(isBooklet){
+    h+=`<h3>جدول کامل فرمول باد در جزوه</h3><table>
+    <tr><th>کاهش یین باد (Decrease Yin Wind)</th><th>کاهش یانگ باد (Decrease Yang Wind)</th></tr>
+    <tr><td>⬇ کاهش باد کبد</td><td>⬇ کاهش باد کیسه صفرا</td></tr>
+    <tr><td>⬆ افزایش خشکی ریه</td><td>⬆ افزایش خشکی روده بزرگ</td></tr>
+    <tr><td>⬆ افزایش گرمای قلب</td><td>⬆ افزایش گرمای روده کوچک</td></tr>
+    <tr><td>⬇ کاهش باد مغز</td><td>⬇ کاهش باد نخاع</td></tr></table>`;
+  }
+  h+=`</div>`;
+
+  /* ===== ۵. تشخیص بیماری و اصلاح انرژی ===== */
+  h+=`<div class="card"><h2><span class="n">۵</span> تشخیص بیماری و اصلاح انرژی</h2>
+  <h3>تشخیص نهایی</h3>
+  <div class="fx"><b style="font-size:16px;color:${P.hex}">${yangW?'افزایش یانگ':'افزایش یین'} ${P.fa} — ${ynEn} ${P.en} Excess</b>
+  <div style="font-size:12.5px;color:var(--tx2);margin-top:5px">اختلال در مریدین ${organ}${r.hasSecondary?`، با لایه ثانویه ${S.fa} در ${yangW?S.yangOrgan:S.yinOrgan}`:''}${r.liverDef?'، روی زمینه کاهش مریدین کبد':''}.</div></div>
+  <h3>گام‌های اصلاح انرژی</h3><ol class="li">
+   <li><b>سدیت (Sedating) ${P.fa}:</b> در مسیر <b>خلاف</b> جهت مریدین ${organ}؛ رنگ ${P.colorFa} یا مگنت قطب مناسب روی نقاط دردناک تناظری.</li>
+   <li><b>تونینگ (Toning) ${AX.fa}:</b> <b>در</b> مسیر مریدین ${yangW?AX.yangOrgan:AX.yinOrgan} — اجرای قانون محور.</li>
+   <li><b>تقویت ${CT.fa}:</b> طبق قانون کنترل جزوه، افزایش ${CT.fa} مستقیماً ${P.fa} را می‌کاهد.</li>
+   <li><b>اصلاح تغذیه‌ای:</b> ${T.diet}</li>
+   <li><b>تکرار:</b> ${reps} در هر جلسه (${r.sex==='m'?'مرد ← ۳ بار':'زن ← ۲ بار'}) <span class="tag src">جزوه</span>؛ ماساژ نقاط ۳ تا ۵ بار در روز.</li>
+   <li><b>پرهیز محیطی:</b> ${envAvoid(r.p1)}</li>
+  </ol></div>`;
+
+  /* ===== ۶. احساسات ===== */
+  const em=EMO[r.p1];
+  h+=`<div class="card"><h2><span class="n">۶</span> تشخیص و اصلاح انرژی در سطح احساسات</h2>
+  <table><tr><th style="width:130px">احساس غالب (جزوه)</th><td><b style="color:${P.hex}">${P.emotion}</b> — ${P.emotionEn}</td></tr>
+  <tr><th>تظاهر در عدم تعادل</th><td>${em.excess}</td></tr>
+  <tr><th>الگوی ${ynFa}</th><td>${yangW?'بروز بیرونی و انفجاری احساس (فریاد، پرتاب، واکنش فوری)':'حبس درونی احساس (کینه، نشخوار، به یاد سپردن طولانی)'}</td></tr></table>
+  <h3>راهکار اصلاح احساسی</h3><ul class="li">${em.fix.map(x=>`<li>${x}</li>`).join('')}</ul>
+  ${r.hasSecondary?`<div class="note">لایه ثانویه ${S.fa}: احساس ${S.emotion} نیز باید پایش شود — ${EMO[r.p2].excess}</div>`:''}
+  <div class="note inf">اصل جزوه: احساس، ورودی مستقیم انرژی است. تا زمانی که ${P.emotion.split(' و ')[0]} تخلیه نشود، سدیت فیزیکی ${P.fa} پایدار نمی‌ماند.</div></div>`;
+
+  /* ===== ۷. ذهن ===== */
+  const mi=MIND[r.p1];
+  h+=`<div class="card"><h2><span class="n">۷</span> تشخیص و اصلاح انرژی در سطح ذهن</h2>
+  <div class="fx"><b>وضعیت ذهنی:</b> ${mi.state}</div>
+  <h3>راهکار اصلاح ذهنی</h3><ul class="li">${mi.fix.map(x=>`<li>${x}</li>`).join('')}</ul>
+  <table><tr><th style="width:130px">الگوی ارتباطی متناظر</th><td>${commStyle(r.p1)}</td></tr>
+  <tr><th>الگوی خواب هدف</th><td>${P.sleep}</td></tr></table></div>`;
+
+  /* ===== ۸. فرمول اصلاح انرژی شاخه ===== */
+  h+=`<div class="card"><h2><span class="n">۸</span> فرمول اصلاح انرژی شاخه <span style="font-size:12px;color:var(--tx3)">(پروتکل اجرایی)</span></h2>
+  <p class="sub">محور ۴ «چه چیزی» را می‌گوید؛ این بخش «چگونه اجرا کردن» را.</p>
+  <table>
+   <tr><th style="width:150px">۱. جهت تحریک</th><td><b>سدیت ${P.fa}:</b> خلاف مسیر مریدین ${organ} &nbsp;|&nbsp; <b>تونینگ ${AX.fa}:</b> در مسیر مریدین ${yangW?AX.yangOrgan:AX.yinOrgan} <span class="tag src">جزوه</span></td></tr>
+   <tr><th>۲. ابزار</th><td>رنگ‌درمانی (ماژیک/برچسب رنگی)، مگنت (قطب N برای سدیت، S برای تونینگ)، ماساژ با پروب یا نوک قلم روی نقطه دردناک</td></tr>
+   <tr><th>۳. محل</th><td>سیستم تناظر <b>دست و پا</b> — نقاط دردناک اندام‌های ${organ}، ${yangW?AX.yangOrgan:AX.yinOrgan}، ${yangW?CH.yangOrgan:CH.yinOrgan} و ${yangW?'نخاع':'مغز'}</td></tr>
+   <tr><th>۴. تعداد تکرار</th><td><b>${reps}</b> در هر جلسه — تفاوت جنسیتی جزوه (زن ۲ بار / مرد ۳ بار) <span class="tag src">جزوه</span></td></tr>
+   <tr><th>۵. تواتر روزانه</th><td>ماساژ نقاط دردناک <b>۳ تا ۵ بار در روز</b> <span class="tag src">جزوه</span></td></tr>
+   <tr><th>۶. ترتیب اجرا</th><td>${r.liverDef?'ابتدا تونینگ کبد (رفع کمبود) ← ':''}سدیت ${P.fa} ← تونینگ ${AX.fa} ← تونینگ ${CH.fa} ← تنظیم ${yangW?'نخاع':'مغز'}</td></tr>
+   <tr><th>۷. بازارزیابی</th><td>پس از ۷ تا ۱۰ روز، پرسشنامه را دوباره تکمیل و جابه‌جایی نسبت یین/یانگ را بسنجید</td></tr>
+  </table>
+  <div class="fx" style="margin-top:12px"><b>فرمول فشرده:</b><br>
+  <span style="font-size:14.5px;line-height:2.4">
+  <span class="dn">کاهش</span> ${P.fa} (${organ}) &nbsp;<b style="color:var(--tx3)">+</b>&nbsp;
+  <span class="up">افزایش</span> ${AX.fa} (${yangW?AX.yangOrgan:AX.yinOrgan}) &nbsp;<b style="color:var(--tx3)">+</b>&nbsp;
+  <span class="up">افزایش</span> ${CH.fa} (${yangW?CH.yangOrgan:CH.yinOrgan}) &nbsp;<b style="color:var(--tx3)">+</b>&nbsp;
+  <span class="dn">کاهش</span> ${P.fa} (${yangW?'نخاع':'مغز'})</span></div></div>`;
+
+  /* ===== ۹. یین/یانگ + نقاط + رنگ ===== */
+  const pts=PTS[r.p1], ptsAx=PTS[AXIS[r.p1]];
+  h+=`<div class="card"><h2><span class="n">۹</span> یین/یانگ بیماری، نقاط طب سوزنی و رنگ‌درمانی</h2>
+  <h3>الف) تعیین یین و یانگ</h3>
+  <table><tr><th style="width:130px">ماهیت بیماری</th><td><b style="color:${yangW?'var(--yang)':'var(--yin)'};font-size:15px">${ynFa} (${ynEn})</b> — ${faInt(r.yangPct)}٪ یانگ / ${faInt(100-r.yangPct)}٪ یین</td></tr>
+  <tr><th>شواهد</th><td>${yinYangEvidence(r)}</td></tr>
+  <tr><th>معنای درمانی</th><td>${yangW?'انرژی مازاد در مریدین یانگ ('+P.yangOrgan+') متمرکز است؛ سدیت باید روی مریدین یانگ اجرا شود.':'انرژی در مریدین یین ('+P.yinOrgan+') راکد شده؛ ابتدا حرکت‌دهی و سپس سدیت.'}</td></tr></table>
+
+  <h3>ب) نقاط سوجوک (سیستم تناظر) <span class="tag src">پایه جزوه</span></h3>
+  <div class="fx">${pts.sujok}<div style="font-size:12px;color:var(--tx3);margin-top:6px">نقطه صحیح = نقطه‌ای که با فشار <b>حساس و دردناک</b> است. روزانه ۳ تا ۵ بار، هر بار ${reps}.</div></div>
+  <div class="fx">همچنین ناحیه تناظری محور (<b>${AX.fa}</b>) برای تونینگ: ${ptsAx.sujok}</div>
+
+  <h3>ج) نقاط طب سوزنی کلاسیک <span class="tag der2">خارج از متن جزوه — مرجع TCM</span></h3>
+  <div class="ptbox">${pts.tcm.map(([c,d])=>`<div class="pt"><b>${c}</b><br>${d}</div>`).join('')}</div>
+  <div style="margin-top:8px;font-size:12.5px;color:var(--tx2)">نقاط تقویت محور (${AX.fa}):</div>
+  <div class="ptbox">${ptsAx.tcm.slice(0,2).map(([c,d])=>`<div class="pt"><b>${c}</b><br>${d}</div>`).join('')}</div>
+
+  <h3>د) رنگ‌درمانی <span class="tag src">سؤال ۱۹ جزوه</span></h3>
+  <table>
+   <tr><th style="width:150px">رنگ اصلی (سدیت)</th><td><span class="sw" style="background:${P.hex}"></span> <b>${P.colorFa} (${P.colorEn})</b> — روی نقاط تناظری ${organ}، خلاف مسیر مریدین</td></tr>
+   <tr><th>رنگ کمکی (تونینگ محور)</th><td><span class="sw" style="background:${AX.hex}"></span> <b>${AX.colorFa} (${AX.colorEn})</b> — روی نقاط ${yangW?AX.yangOrgan:AX.yinOrgan}، در مسیر مریدین</td></tr>
+   <tr><th>رنگ سوم (قانون کنترل)</th><td><span class="sw" style="background:${CT.hex}"></span> <b>${CT.colorFa}</b> — افزایش ${CT.fa} برای مهار ${P.fa}</td></tr>
+   <tr><th>پرهیز رنگی</th><td>کاهش مواجهه با رنگ ${E[MOTHER[r.p1]].colorFa} (${E[MOTHER[r.p1]].fa} = مادر ${P.fa}؛ تقویت آن ${P.fa} را می‌افزاید) <span class="tag der2">استنتاج</span></td></tr>
+   <tr><th>قاعده جزوه</th><td>علاقه به یک رنگ ← نیاز به <b>کاهش</b> انرژی متناظر آن؛ تنفر از یک رنگ ← <b>افزایش</b> آن انرژی در نظر گرفته می‌شود.</td></tr>
+  </table>
+  <div class="note">📌 خلاصه یک‌خطی برای بیمار: <b>${P.colorFa}</b> روی نقاط ${organ} (خلاف مسیر) + <b>${AX.colorFa}</b> روی نقاط ${yangW?AX.yangOrgan:AX.yinOrgan} (در مسیر) — روزانه ۳ تا ۵ بار، هر بار ${reps}؛ همراه با ${T.diet}</div>
+  </div>`;
+
+  document.getElementById('res').innerHTML=h;
+  wrapTables(document.getElementById('res'));
+  document.getElementById('res').classList.add('on');
+  document.getElementById('emptyBox').style.display='none';
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function hotColdLabel(r){ return (r.s.heat+r.s.hotness+0.5*r.s.wind) - (r.s.coldness+0.5*r.s.humidity); }
+function dryWetLabel(r){ return (r.s.dryness+0.5*r.s.wind) - (r.s.humidity+0.4*r.s.heat); }
+
+function commStyle(e){
+  return {
+    wind:'الگوی رهبری / هدایت‌کننده — هدف‌گرا و نتیجه‌محور؛ پاسخ: انرژی باد (+) یانگ <span class="tag src">جزوه</span>',
+    heat:'الگوی تاثیرگذاری / تعامل‌کننده — برون‌گرا، متقاعدکننده، روابط‌محور؛ پاسخ: انرژی گرما/داغی (+) یانگ <span class="tag src">جزوه</span>',
+    hotness:'الگوی تاثیرگذاری / تعامل‌کننده — کاریزماتیک و رهبر؛ پاسخ: انرژی گرما/داغی (+) یانگ <span class="tag src">جزوه</span>',
+    humidity:'الگوی حمایت‌کننده / ثبات‌دهنده — آرام، صبور، حمایتگر؛ پاسخ: انرژی رطوبت (+) یانگ <span class="tag src">جزوه</span>',
+    dryness:'الگوی مطیع / دقیق (محتاط) — دقیق، محتاط، پیرو قوانین؛ پاسخ: انرژی خشکی (−) یین <span class="tag src">جزوه</span>',
+    coldness:'الگوی مطیع / دقیق (محتاط) — محتاط و منزوی؛ پاسخ: انرژی سرما (+) یانگ <span class="tag src">جزوه</span>'
+  }[e];
+}
+function envAvoid(e){
+  return {wind:'پرهیز از باد مستقیم و کولر روی سر و گردن، صداهای ناگهانی و بلند، رانندگی پرسرعت، ترشی زیاد',
+    heat:'پرهیز از غذای تند، الکل، محیط گرم و شلوغ، هیجان شبانه',
+    hotness:'پرهیز از کار کشیدن مفرط، بی‌خوابی، محرک‌های ذهنی شبانه',
+    humidity:'پرهیز از شیرینی، لبنیات، غذای سرد و خام، سکون و کم‌تحرکی، محیط مرطوب',
+    dryness:'پرهیز از هوای خشک، غذاهای خشک (عدس، بادمجان)، کم‌آبی، سرکوب اندوه',
+    coldness:'پرهیز از سرما و رطوبت، غذای سرد، خواب مفرط روزانه، انزوا'}[e];
+}
+function yinYangEvidence(r){
+  const a=[];
+  if(r.course==='acute') a.push('سیر حاد و ناگهانی (یانگ)');
+  if(r.course==='chronic') a.push('سیر مزمن و تدریجی (یین)');
+  const qy=[12,15,16,21,24,28,29,33,34,36,37], qn=[22,23,25,27,35];
+  const py=qy.filter(i=>state.q[i]==='y'), pn=qn.filter(i=>state.q[i]==='y');
+  if(py.length) a.push('پاسخ مثبت به سؤالات یانگ‌ساز پرسشنامه: '+py.map(faInt).join('، '));
+  if(pn.length) a.push('پاسخ مثبت به سؤالات یین‌ساز پرسشنامه: '+pn.map(faInt).join('، '));
+  if(state.q[13]==='a') a.push('سؤال ۱۳-الف (شیء از دست می‌افتد) ← یانگ باد');
+  if(state.q[13]==='b') a.push('سؤال ۱۳-ب (با لرزش هنوز نگه می‌دارد) ← یین باد');
+  if(state.q[26]==='a') a.push('سؤال ۲۶-الف (آلرژی ناگهانی و کوتاه) ← یانگ باد');
+  if(state.q[26]==='b') a.push('سؤال ۲۶-ب (آلرژی پایدار و قابل پیش‌بینی) ← یین باد');
+  return a.length? a.join('؛ ') : 'بر پایه ماهیت نشانه‌های متن (سرعت شروع، شدت، جهت حرکت انرژی).';
+}
+
+/* =========================================================================
+   بخش ۷ — ساخت رابط کاربری
+   ========================================================================= */
+/* چک‌لیست */
+(function(){
+  let h='';
+  CHECKS.forEach((g,gi)=>{
+    h+=`<div class="gt">${g[0]}</div>`;
+    g[1].forEach((c,ii)=>{
+      h+=`<label class="chk" data-id="${gi}-${ii}"><input type="checkbox"><span style="color:${E[c[1]].hex}">●</span> ${c[0]}</label>`;
+    });
+  });
+  const box=document.getElementById('chkBox'); box.innerHTML=h;
+  box.querySelectorAll('.chk').forEach(el=>{
+    el.addEventListener('change',()=>{
+      const id=el.dataset.id;
+      if(el.querySelector('input').checked){state.checks.add(id);el.classList.add('on');}
+      else{state.checks.delete(id);el.classList.remove('on');}
+    });
+  });
+})();
+
+/* پرسشنامه */
+(function(){
+  const groups=[[1,10],[11,20],[21,30],[31,38]];
+  let h='';
+  groups.forEach(([a,b],gi)=>{
+    h+=`<details class="q" ${gi===0?'open':''}><summary>سؤالات ${faInt(a)} تا ${faInt(b)}</summary>`;
+    Q.filter(q=>q.i>=a&&q.i<=b).forEach(q=>{
+      h+=`<div class="qi"><div class="qt"><b>${faInt(q.i)}.</b> ${q.t}<div class="qn">${q.lab}</div>`;
+      if(q.type==='ab') h+=`<div class="qn">الف) ${q.a} &nbsp;·&nbsp; ب) ${q.b}</div>`;
+      h+=`</div><div class="seg" data-i="${q.i}">`;
+      if(q.type==='ab') h+=`<button data-v="a">الف</button><button data-v="b">ب</button>`;
+      else if(q.type==='color') h+=`<button data-v="green:love" title="سبز">🟢</button><button data-v="red:love" title="قرمز">🔴</button><button data-v="orange:love" title="نارنجی">🟠</button><button data-v="yellow:love" title="زرد">🟡</button><button data-v="brown:love" title="قهوه‌ای">🟤</button><button data-v="blue:love" title="آبی">🔵</button>`;
+      else h+=`<button data-v="y">بله</button><button data-v="n" class="no">خیر</button>`;
+      h+=`</div></div>`;
+    });
+    h+=`</details>`;
+  });
+  const box=document.getElementById('qBox'); box.innerHTML=h;
+  box.querySelectorAll('.seg').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const i=+seg.dataset.i, v=b.dataset.v;
+        if(state.q[i]===v){delete state.q[i]; b.classList.remove('on');}
+        else{state.q[i]=v; seg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on');}
+      });
+    });
+  });
+})();
+
+/* کتابخانه */
+(function(){
+  const sel=document.getElementById('caseSel'); const box=document.getElementById('libBox');
+  const groups={};
+  CASES.forEach((c,i)=>{(groups[c.g]=groups[c.g]||[]).push({c,i});});
+  let so='', bh='';
+  Object.keys(groups).forEach(g=>{
+    so+=`<optgroup label="${g}">`+groups[g].map(({c,i})=>`<option value="${i}">${c.t}</option>`).join('')+`</optgroup>`;
+    bh+=`<h3 style="color:var(--gold);margin:18px 0 8px">${g}</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">`;
+    bh+=groups[g].map(({c,i})=>`<div class="pt" style="cursor:pointer" data-ci="${i}">
+      <b style="color:var(--acc)">${c.t}</b>
+      <div style="color:var(--tx2);margin-top:5px;font-size:12px">${c.x.slice(0,120)}…</div>
+      ${c.note?`<div style="color:var(--gold);font-size:11.5px;margin-top:6px">✔ ${c.note}</div>`:''}
+      <div style="margin-top:8px"><span class="badge" style="font-size:11px">بارگذاری و تحلیل ▸</span></div></div>`).join('');
+    bh+=`</div>`;
+  });
+  sel.innerHTML='<option value="">— شرح حال آماده را انتخاب کنید —</option>'+so;
+  box.innerHTML=bh;
+  const load=i=>{
+    const c=CASES[i];
+    document.getElementById('hx').value=c.x;
+    document.getElementById('age').value=c.age||'';
+    document.getElementById('sex').value=c.sex||'f';
+    document.getElementById('course').value=c.course||'';
+    state.q={}; Object.keys(c.q||{}).forEach(k=>state.q[+k]=c.q[k]);
+    document.querySelectorAll('.seg').forEach(seg=>{
+      const v=state.q[+seg.dataset.i];
+      seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+    });
+    state.checks.clear();
+    document.querySelectorAll('.chk').forEach(el=>{el.classList.remove('on');const c2=el.querySelector('input');if(c2)c2.checked=false;});
+    switchPane('p1'); render();
+  };
+  sel.addEventListener('change',()=>{ if(sel.value!=='') load(+sel.value); });
+  box.querySelectorAll('[data-ci]').forEach(el=>el.addEventListener('click',()=>load(+el.dataset.ci)));
+})();
+
+/* مرجع جزوه */
+(function(){
+  let h='';
+  h+=`<div class="card ref"><h2><span class="n">۱</span> ماهیت کانستیتوشن (مزاج یا قانون اساسی)</h2>
+  <ul class="li">
+   <li><b>ترکیب ساختاری (پایه متافیزیکی):</b> قانون اساسی هر فرد مانند یک نقشه راه عمل کرده و تمامی فرآیندهای بدنی را هدایت می‌کند؛ بر پایه قوانین یین و یانگ و پنج عنصر (چوب، آتش، خاک، فلز، آب) ساخته شده و توسط دوازده ارگان داخلی هدایت می‌شود.</li>
+   <li><b>سیستم پویا در برابر ثابت:</b> کانستیتوشن یک سیستم ثابت و سخت نیست، بلکه یک تعادل پویاست که تحت تاثیر عوامل داخلی یا خارجی تغییر می‌کند.</li>
+   <li><b>مزاج غالب:</b> هر فرد معمولاً یک یا دو مزاج غالب دارد که شخصیت، وضعیت جسمانی و روانی او را شکل می‌دهد.</li>
+   <li><b>عوامل تاثیرگذار:</b> ذاتی (ژنتیک، صفات والدین، سلامت مادر در بارداری) · محیطی (فصل، آب‌وهوا، جغرافیا) · فردی (معنویت، باورها، عادات رفتاری).</li>
+   <li><b>تغییر در اثر بیماری:</b> بیماری‌های حاد ← تغییر موقت و بازگشت‌پذیر · بیماری‌های مزمن ← تبدیل به حالت پایدار و ثابت با افزایش یا تخلیه یک یا چند انرژی.</li>
+  </ul></div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۲</span> چهار مزاج طب ایرانی (Unani)</h2><table>
+  <tr><th>مزاج</th><th>جسمانی</th><th>رفتاری</th><th>توصیه غذایی</th></tr>`;
+  ['choleric','sanguine','phlegmatic','melancholic'].forEach(k=>{
+    h+=`<tr><td><b>${TEMP[k].fa}</b><br><span style="color:var(--tx3);font-size:11.5px">${TEMP[k].en}</span></td>
+    <td>${TEMP[k].phys}</td><td>${TEMP[k].behav}</td><td>${TEMP[k].diet}</td></tr>`;});
+  h+=`</table></div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۳</span> شش انرژی سوجوک (6 Ki)</h2>`;
+  EK.forEach(k=>{const e=E[k];
+    h+=`<div class="fx" style="border-right:3px solid ${e.hex}">
+    <b style="color:${e.hex};font-size:15px">${e.fa} (${e.en})</b>
+    <table style="margin-top:8px">
+     <tr><th style="width:120px">عنصر</th><td>${e.el} (${e.elEn})</td><th style="width:120px">اندام‌های مرتبط</th><td>${e.yinOrgan} (${e.yinOrganEn}) و ${e.yangOrgan} (${e.yangOrganEn})</td></tr>
+     <tr><th>احساس غالب</th><td>${e.emotion}</td><th>رده سنی</th><td>${e.age}</td></tr>
+     <tr><th>ویژگی جسمی</th><td colspan="3">${e.body}</td></tr>
+     <tr><th>ویژگی رفتاری</th><td colspan="3">${e.behavior}</td></tr>
+     <tr><th>علائم عدم تعادل</th><td colspan="3"><b>${e.imbalance}</b></td></tr>
+     <tr><th>رنگ</th><td>${e.colorFa} <span class="sw" style="background:${e.hex}"></span></td><th>خواب و اشتها</th><td>${e.sleep}</td></tr>
+    </table></div>`;});
+  h+=`</div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۴</span> پروفایل مقایسه‌ای ۶ انرژی</h2>
+  <div style="overflow-x:auto"><table><tr><th>ویژگی</th>${EK.map(k=>`<th style="color:${E[k].hex}">${E[k].fa}<br><span style="font-size:10.5px;color:var(--tx3)">${E[k].en}</span></th>`).join('')}</tr>
+  ${[['رده سنی','age'],['ساختار بدنی','bodyTbl'],['نوع حرکت','move'],['پوست و ظاهر','skin'],['صدا و لحن','voice'],['شخصیت / خلق‌وخو','person'],['الگوی خواب و اشتها','sleep']]
+    .map(([lb,f])=>`<tr><td><b>${lb}</b></td>${EK.map(k=>`<td>${E[k][f]}</td>`).join('')}</tr>`).join('')}
+  </table></div></div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۵</span> تشخیص از روی سبک ارتباطی</h2><table>
+   <tr><th style="width:230px">الف) الگوی رهبری / هدایت‌کننده</th><td>هدف‌گرا و نتیجه‌محور، مسئولیت‌پذیر، بی‌ترس در تصمیم‌گیری → <b>انرژی باد (+) یانگ</b></td></tr>
+   <tr><th>ب) الگوی تاثیرگذاری / تعامل‌کننده</th><td>برون‌گرا، متقاعدکننده، روابط‌محور → <b>انرژی گرما / داغی (+) یانگ</b></td></tr>
+   <tr><th>ج) الگوی حمایت‌کننده / ثبات‌دهنده</th><td>آرام، صبور، حمایتگر، حفظ ثبات و هماهنگی → <b>انرژی رطوبت (+) یانگ</b></td></tr>
+   <tr><th>د) الگوی مطیع / دقیق (محتاط)</th><td>محتاط، توجه به جزئیات، پیرو کامل قوانین → <b>انرژی خشکی (−) یین / سرما (+) یانگ</b></td></tr>
+  </table><div class="note">وقتی در پاسخ‌ها «باد +» نوشته می‌شود، منظور انرژی یین باد و یانگ باد هر دو است، یعنی به‌طور کلی «غلبه مزاج باد».</div></div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۶</span> قوانین اصلاح انرژی در سوجوک</h2><ul class="li">
+   <li><b>قانون کنترل (چرخه مخرب):</b> انرژی‌های روی یک محور بر یکدیگر تاثیر می‌گذارند؛ به عنوان مثال با افزایش رطوبت، باد کاهش می‌یابد.</li>
+   <li><b>قانون محور:</b> ایجاد تعادل در انرژی‌ها با هدف قرار دادن انرژی مخالف روی چرخه.</li>
+   <li><b>دستکاری مریدین‌ها:</b> افزایش (Toning) یا کاهش (Sedating) انرژی با استفاده از رنگ‌ها یا مگنت‌ها در مسیر یا خلاف مسیر مریدین.</li>
+   <li><b>تفاوت جنسیتی:</b> اجرای تکنیک‌ها ۲ بار برای زنان و ۳ بار برای مردان.</li>
+   <li><b>پروتکل کاربردی:</b> نقاط دردناک ارگان مربوطه روی دست و پا، روزانه ۳ تا ۵ بار ماساژ داده می‌شوند.</li>
+  </ul>
+  <h3>جدول کاهش غلبه «باد»</h3><table>
+   <tr><th>کاهش یین باد (Decrease Yin Wind)</th><th>کاهش یانگ باد (Decrease Yang Wind)</th></tr>
+   <tr><td>⬇ کاهش باد کبد</td><td>⬇ کاهش باد کیسه صفرا</td></tr>
+   <tr><td>⬆ افزایش خشکی ریه</td><td>⬆ افزایش خشکی روده بزرگ</td></tr>
+   <tr><td>⬆ افزایش گرمای قلب</td><td>⬆ افزایش گرمای روده کوچک</td></tr>
+   <tr><td>⬇ کاهش باد مغز</td><td>⬇ کاهش باد نخاع</td></tr></table>
+  <h3>تعمیم الگو به پنج انرژی دیگر <span class="tag der2">استنتاج</span></h3>
+  <div style="overflow-x:auto"><table><tr><th>انرژی غالب</th><th>گام ۱ (سدیت)</th><th>گام ۲ (محور)</th><th>گام ۳ (فرزند)</th><th>گام ۴ (مرکزی)</th></tr>
+  ${EK.map(k=>{const f=branchFormula(k,false);
+    return `<tr><td><b style="color:${E[k].hex}">${E[k].fa}</b> (یین)</td>${f.map(x=>`<td>${x.d==='up'?'⬆':'⬇'} ${x.txt.replace(/<\/?b>/g,'')}</td>`).join('')}</tr>`;}).join('')}
+  ${EK.map(k=>{const f=branchFormula(k,true);
+    return `<tr><td><b style="color:${E[k].hex}">${E[k].fa}</b> (یانگ)</td>${f.map(x=>`<td>${x.d==='up'?'⬆':'⬇'} ${x.txt.replace(/<\/?b>/g,'')}</td>`).join('')}</tr>`;}).join('')}
+  </table></div>
+  <div class="note der">سطرهای «باد» عیناً از جزوه‌اند و بقیه با همان الگوی چهارگامی تعمیم داده شده‌اند: سدیت خود انرژی ← تقویت انرژی محور ← تقویت انرژی فرزند ← تنظیم سطح مرکزی (مغز در یین، نخاع در یانگ).</div></div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۷</span> چرخه‌ها و روابط ۶ انرژی</h2><table>
+   <tr><th>انرژی</th><th>محور (مقابل)</th><th>فرزند (مولود)</th><th>مادر</th><th>کنترل‌شونده (طبق جزوه)</th><th>رنگ</th></tr>
+   ${EK.map(k=>`<tr><td><b style="color:${E[k].hex}">${E[k].fa}</b></td><td>${E[AXIS[k]].fa}</td><td>${E[CHILD[k]].fa}</td><td>${E[MOTHER[k]].fa}</td><td>${E[CONTROLLED[k]].fa}</td><td>${E[k].colorFa} <span class="sw" style="background:${E[k].hex}"></span></td></tr>`).join('')}
+  </table></div>`;
+
+  h+=`<div class="card ref"><h2><span class="n">۸</span> پرسشنامه ۳۸ سؤالی باد — متن کامل</h2><table>
+  <tr><th style="width:40px">#</th><th>سؤال</th><th style="width:220px">پاسخ / امتیاز</th></tr>
+  ${Q.map(q=>`<tr><td>${faInt(q.i)}</td><td>${q.t}${q.type==='ab'?`<br><span style="color:var(--tx3);font-size:12px">الف) ${q.a} — ب) ${q.b}</span>`:''}</td><td style="color:var(--acc)">${q.lab}</td></tr>`).join('')}
+  </table></div>`;
+
+  document.getElementById('refBox').innerHTML=h;
+})();
+
+/* اسکرول افقی جدول‌ها روی موبایل */
+function wrapTables(root){
+  root.querySelectorAll('table').forEach(t=>{
+    if(t.parentElement && t.parentElement.classList.contains('tw')) return;
+    const cols = t.rows[0] ? [...t.rows[0].cells].reduce((a,c)=>a+(c.colSpan||1),0) : 2;
+    const d=document.createElement('div'); d.className='tw'+(cols>2?' wide':'');
+    t.parentNode.insertBefore(d,t); d.appendChild(t);
+  });
+}
+wrapTables(document.getElementById('refBox'));
+
+/* تب‌ها و دکمه‌ها */
+function switchPane(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.p===id));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchPane(t.dataset.p)));
+document.getElementById('go').addEventListener('click',render);
+document.getElementById('prn').addEventListener('click',()=>window.print());
+document.getElementById('qclr').addEventListener('click',()=>{
+  state.q={}; document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('on'));
+});
+document.getElementById('clr').addEventListener('click',()=>{
+  document.getElementById('hx').value=''; document.getElementById('age').value='';
+  document.getElementById('course').value=''; document.getElementById('caseSel').value='';
+  state.q={}; state.checks.clear();
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.chk').forEach(el=>{el.classList.remove('on');const c=el.querySelector('input');if(c)c.checked=false;});
+  document.getElementById('res').classList.remove('on');
+  document.getElementById('emptyBox').style.display='block';
+});
+document.getElementById('hx').addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter') render();
+});
+</script>
+</body>
+</html>
